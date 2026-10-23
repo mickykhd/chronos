@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Dial ring -->
+    <path
+        android:pathData="M24,54 a30,30 0 1 1 60,0 a30,30 0 1 1 -60,0"
+        android:strokeColor="#FFB782"
+        android:strokeWidth="3.5"
+        android:strokeAlpha="0.55"
+        android:fillColor="#00000000" />
+
+    <!-- Cardinal ticks -->
+    <path
+        android:pathData="M54,22 L54,28"
+        android:strokeColor="#FFB782"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M54,80 L54,86"
+        android:strokeColor="#9F8D82"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+
+    <!-- Hour hand -->
+    <path
+        android:pathData="M54,54 L54,37"
+        android:strokeColor="#FFDCC5"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round" />
+
+    <!-- Minute hand -->
+    <path
+        android:pathData="M54,54 L69,63"
+        android:strokeColor="#FFB782"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round" />
+
+    <!-- Second hand -->
+    <path
+        android:pathData="M54,64 L54,29"
+        android:strokeColor="#F5E1A7"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+
+    <!-- Pivot -->
+    <path
+        android:pathData="M54,51.5 a2.5,2.5 0 1 1 -0.01,0"
+        android:fillColor="#F5E1A7" />
+</vector>

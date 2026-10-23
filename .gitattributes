@@ -1,0 +1,13 @@
+# Normalise line endings: LF in the repository, CRLF for Windows scripts.
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binaries
+*.jar binary
+*.ttf binary
+*.png binary
+*.jks binary
+*.apk binary
+*.aab binary

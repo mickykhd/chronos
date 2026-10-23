@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Material You Clock - Stopwatch</title>
+<!-- Google Fonts: Roboto Flex & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#d8c58d",
+            "inverse-on-surface": "#2f3133",
+            "on-secondary-container": "#d8afa4",
+            "outline": "#9f8d82",
+            "primary": "#ffdcc5",
+            "on-tertiary": "#3b2f05",
+            "tertiary": "#f5e1a7",
+            "tertiary-fixed": "#f5e1a7",
+            "inverse-surface": "#e2e2e5",
+            "error": "#ffb4ab",
+            "secondary": "#e7bdb1",
+            "background": "#121416",
+            "secondary-container": "#604239",
+            "on-primary-fixed-variant": "#6b3a10",
+            "outline-variant": "#52443b",
+            "surface-bright": "#37393b",
+            "secondary-fixed": "#ffdbd0",
+            "on-primary-container": "#79461b",
+            "surface-container-lowest": "#0c0e10",
+            "on-primary": "#4f2500",
+            "surface-container": "#1e2022",
+            "on-secondary-fixed": "#2c150e",
+            "surface-container-low": "#1a1c1e",
+            "surface-container-high": "#282a2c",
+            "error-container": "#93000a",
+            "on-tertiary-fixed": "#231b00",
+            "on-tertiary-container": "#5f5124",
+            "surface-tint": "#ffb782",
+            "surface-variant": "#333537",
+            "primary-container": "#ffb782",
+            "secondary-fixed-dim": "#e7bdb1",
+            "on-error": "#690005",
+            "on-primary-fixed": "#301400",
+            "surface-dim": "#121416",
+            "on-background": "#e2e2e5",
+            "surface": "#121416",
+            "on-error-container": "#ffdad6",
+            "primary-fixed": "#ffdcc5",
+            "inverse-primary": "#875125",
+            "on-surface": "#e2e2e5",
+            "on-secondary-fixed-variant": "#5d4037",
+            "surface-container-highest": "#333537",
+            "primary-fixed-dim": "#ffb782",
+            "on-tertiary-fixed-variant": "#53461a",
+            "tertiary-fixed-dim": "#d8c58d",
+            "on-secondary": "#442a22",
+            "on-surface-variant": "#d7c3b6"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "margin": "1.5rem",
+            "gutter-mobile": "0.75rem",
+            "margin-mobile": "1rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-lg-mobile": ["Roboto Flex"],
+            "headline-md": ["Roboto Flex"],
+            "body-md": ["Roboto Flex"],
+            "label-md": ["Roboto Flex"],
+            "headline-lg": ["Roboto Flex"],
+            "title-lg": ["Roboto Flex"],
+            "label-sm": ["Roboto Flex"],
+            "body-lg": ["Roboto Flex"],
+            "display-hero": ["Roboto Flex"],
+            "title-md": ["Roboto Flex"],
+            "headline-sm": ["Roboto Flex"],
+            "label-lg": ["Roboto Flex"],
+            "display-hero-mobile": ["Roboto Flex"]
+          },
+          "fontSize": {
+            "headline-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "title-lg": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-hero": ["96px", { "lineHeight": "96px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "display-hero-mobile": ["64px", { "lineHeight": "68px", "letterSpacing": "-0.03em", "fontWeight": "300" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .font-tabular {
+      font-feature-settings: "tnum" 1, "zero" 1;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased select-none min-h-screen flex flex-col justify-between overflow-x-hidden">
+<!-- TOP APP BAR (from Shared Component JSON: type small, headline 'Clock', alarm leading, more_vert trailing) -->
+<header class="bg-background dark:bg-background docked full-width top-0 z-40 sticky">
+<div class="flex justify-between items-center w-full px-space-md h-16">
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-outline dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="alarm">alarm</span>
+</button>
+<span class="text-headline-sm font-headline-sm font-medium text-on-surface dark:text-on-surface tracking-tight">Clock</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface dark:text-on-surface hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 transition-transform duration-150" title="Options">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS -->
+<main class="flex-1 w-full max-w-3xl mx-auto px-4 md:px-6 pb-28 flex flex-col items-center">
+<!-- HERO STOPWATCH SECTION (Dual-ring circular gauge & digital numerals) -->
+<section class="w-full flex flex-col items-center pt-2 pb-6 relative">
+<div class="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center my-2">
+<!-- Outer Circular Graphic Gauge (Ticks & Progress track) -->
+<svg class="absolute inset-0 w-full h-full transform -rotate-90" viewbox="0 0 260 260">
+<!-- Background track circle -->
+<circle class="text-surface-container-high" cx="130" cy="130" fill="transparent" r="116" stroke="currentColor" stroke-width="4"></circle>
+<!-- Concentric subtle tick marks -->
+<circle class="text-surface-container-highest" cx="130" cy="130" fill="transparent" opacity="0.6" r="124" stroke="currentColor" stroke-dasharray="2 10" stroke-width="2"></circle>
+<!-- Animated foreground arc representing current 60s progress -->
+<circle class="text-primary-container" cx="130" cy="130" fill="transparent" r="116" stroke="currentColor" stroke-dasharray="728" stroke-dashoffset="380" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<!-- Current Digital Time Hero Display -->
+<div class="z-10 flex flex-col items-center text-center">
+<span class="text-label-sm font-label-sm text-outline tracking-wider uppercase mb-1">Stopwatch Running</span>
+<div class="flex items-baseline font-tabular">
+<!-- Digital Numerals '02:48.36' (Large bold high-contrast) -->
+<span class="text-display-hero-mobile md:text-display-hero font-display-hero-mobile md:font-display-hero text-on-surface tracking-tight font-medium">02:48</span>
+<span class="text-headline-md font-headline-md text-primary-container ml-1 font-semibold">.36</span>
+</div>
+<span class="text-label-md font-label-md text-secondary mt-1">Lap 4</span>
+</div>
+</div>
+<!-- CONTROLS ROW (Lap, Main Play/Pause, Reset) -->
+<div class="w-full max-w-sm flex items-center justify-between px-6 mt-4">
+<!-- Lap Button -->
+<div class="flex flex-col items-center gap-1.5">
+<button class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center active:scale-90 transition-transform duration-150 border border-white/[0.04] shadow-sm hover:bg-surface-variant" title="Lap">
+<span class="material-symbols-outlined text-2xl" data-icon="flag">flag</span>
+</button>
+<span class="text-label-sm font-label-sm text-outline">Lap</span>
+</div>
+<!-- Main Vibrant Play/Pause Action Pill Button -->
+<button class="h-20 px-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center gap-3 active:scale-95 transition-transform duration-150 shadow-lg shadow-black/40 hover:brightness-105" title="Pause Stopwatch">
+<span class="material-symbols-outlined text-4xl" data-icon="pause" data-weight="fill" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<!-- Reset Button -->
+<div class="flex flex-col items-center gap-1.5">
+<button class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center active:scale-90 transition-transform duration-150 border border-white/[0.04] shadow-sm hover:bg-surface-variant" title="Reset">
+<span class="material-symbols-outlined text-2xl" data-icon="replay">replay</span>
+</button>
+<span class="text-label-sm font-label-sm text-outline">Reset</span>
+</div>
+</div>
+</section>
+<!-- LAP TIMES LIST SECTION -->
+<section class="w-full mt-4 flex flex-col">
+<div class="flex items-center justify-between px-3 py-2 border-b border-surface-container-highest">
+<span class="text-label-md font-label-md text-outline">LAP</span>
+<span class="text-label-md font-label-md text-outline">SPLIT</span>
+<span class="text-label-md font-label-md text-outline text-right">OVERALL</span>
+</div>
+<div class="divide-y divide-surface-container-high flex flex-col">
+<!-- Lap 04 (Fastest Lap) -->
+<div class="flex items-center justify-between py-3.5 px-3 hover:bg-surface-container-low transition-colors rounded-xl">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-body-md text-on-surface font-semibold font-tabular">04</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary-container text-label-sm font-label-sm font-medium border border-tertiary-container/30">
+              Fastest Lap
+            </span>
+</div>
+<span class="text-body-lg font-body-lg font-tabular font-semibold text-tertiary-container">
+            00:32.18
+          </span>
+<span class="text-body-md font-body-md font-tabular text-on-surface-variant text-right">
+            02:48.36
+          </span>
+</div>
+<!-- Lap 03 (Slowest Lap) -->
+<div class="flex items-center justify-between py-3.5 px-3 hover:bg-surface-container-low transition-colors rounded-xl">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-body-md text-on-surface font-semibold font-tabular">03</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-error-container/30 text-error text-label-sm font-label-sm font-medium border border-error/30">
+              Slowest Lap
+            </span>
+</div>
+<span class="text-body-lg font-body-lg font-tabular font-medium text-error">
+            00:45.10
+          </span>
+<span class="text-body-md font-body-md font-tabular text-on-surface-variant text-right">
+            02:16.18
+          </span>
+</div>
+<!-- Lap 02 -->
+<div class="flex items-center justify-between py-3.5 px-3 hover:bg-surface-container-low transition-colors rounded-xl">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-body-md text-on-surface font-medium font-tabular">02</span>
+</div>
+<span class="text-body-lg font-body-lg font-tabular text-on-surface">
+            00:39.82
+          </span>
+<span class="text-body-md font-body-md font-tabular text-on-surface-variant text-right">
+            01:31.08
+          </span>
+</div>
+<!-- Lap 01 -->
+<div class="flex items-center justify-between py-3.5 px-3 hover:bg-surface-container-low transition-colors rounded-xl">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-body-md text-on-surface font-medium font-tabular">01</span>
+</div>
+<span class="text-body-lg font-body-lg font-tabular text-on-surface">
+            00:51.26
+          </span>
+<span class="text-body-md font-body-md font-tabular text-on-surface-variant text-right">
+            00:51.26
+          </span>
+</div>
+</div>
+<!-- Share Laps / Export Action Button -->
+<div class="flex justify-center mt-6">
+<button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface text-label-lg font-label-lg hover:bg-surface-variant active:scale-95 transition-all duration-150 border border-white/[0.04]">
+<span class="material-symbols-outlined text-lg" data-icon="share">share</span>
+<span>Share Laps</span>
+</button>
+</div>
+</section>
+</main>
+<!-- BOTTOM NAVIGATION BAR (Exact execution of Shared Component JSON) -->
+<!-- Contextual Active: 'Stopwatch' tab is active with filled pill container -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-space-sm pb-safe bg-surface-container dark:bg-surface-container">
+<!-- Tab 1: Alarm (Inactive) -->
+<a class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150" href="#">
+<span class="icon-pill inline-flex items-center justify-center rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="alarm">alarm</span>
+</span>
+<span>Alarm</span>
+</a>
+<!-- Tab 2: Clock (Inactive) -->
+<a class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150" href="#">
+<span class="icon-pill inline-flex items-center justify-center rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+</span>
+<span>Clock</span>
+</a>
+<!-- Tab 3: Timer (Inactive) -->
+<a class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150" href="#">
+<span class="icon-pill inline-flex items-center justify-center rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+</span>
+<span>Timer</span>
+</a>
+<!-- Tab 4: Stopwatch (ACTIVE - Mapped to page intent) -->
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface dark:text-on-surface font-label-md text-label-md [&amp;_span.icon-pill]:bg-secondary-container dark:[&amp;_span.icon-pill]:bg-secondary-container [&amp;_span.icon-pill]:text-primary-container dark:[&amp;_span.icon-pill]:text-primary-container [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 [&amp;_span.icon-pill]:rounded-full hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150" href="#">
+<span class="icon-pill inline-flex items-center justify-center rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="timer_10" data-weight="fill" style="font-variation-settings: 'FILL' 1;">timer_10</span>
+</span>
+<span>Stopwatch</span>
+</a>
+</nav>
+</body></html>

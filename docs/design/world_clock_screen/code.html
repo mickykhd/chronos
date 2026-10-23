@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Material You Clock - World Clock</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Roboto Flex -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#d8c58d",
+            "inverse-on-surface": "#2f3133",
+            "on-secondary-container": "#d8afa4",
+            "outline": "#9f8d82",
+            "primary": "#ffdcc5",
+            "on-tertiary": "#3b2f05",
+            "tertiary": "#f5e1a7",
+            "tertiary-fixed": "#f5e1a7",
+            "inverse-surface": "#e2e2e5",
+            "error": "#ffb4ab",
+            "secondary": "#e7bdb1",
+            "background": "#121416",
+            "secondary-container": "#604239",
+            "on-primary-fixed-variant": "#6b3a10",
+            "outline-variant": "#52443b",
+            "surface-bright": "#37393b",
+            "secondary-fixed": "#ffdbd0",
+            "on-primary-container": "#79461b",
+            "surface-container-lowest": "#0c0e10",
+            "on-primary": "#4f2500",
+            "surface-container": "#1e2022",
+            "on-secondary-fixed": "#2c150e",
+            "surface-container-low": "#1a1c1e",
+            "surface-container-high": "#282a2c",
+            "error-container": "#93000a",
+            "on-tertiary-fixed": "#231b00",
+            "on-tertiary-container": "#5f5124",
+            "surface-tint": "#ffb782",
+            "surface-variant": "#333537",
+            "primary-container": "#ffb782",
+            "secondary-fixed-dim": "#e7bdb1",
+            "on-error": "#690005",
+            "on-primary-fixed": "#301400",
+            "surface-dim": "#121416",
+            "on-background": "#e2e2e5",
+            "surface": "#121416",
+            "on-error-container": "#ffdad6",
+            "primary-fixed": "#ffdcc5",
+            "inverse-primary": "#875125",
+            "on-surface": "#e2e2e5",
+            "on-secondary-fixed-variant": "#5d4037",
+            "surface-container-highest": "#333537",
+            "primary-fixed-dim": "#ffb782",
+            "on-tertiary-fixed-variant": "#53461a",
+            "tertiary-fixed-dim": "#d8c58d",
+            "on-secondary": "#442a22",
+            "on-surface-variant": "#d7c3b6"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "margin": "1.5rem",
+            "gutter-mobile": "0.75rem",
+            "margin-mobile": "1rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-lg-mobile": ["Roboto Flex"],
+            "headline-md": ["Roboto Flex"],
+            "body-md": ["Roboto Flex"],
+            "label-md": ["Roboto Flex"],
+            "headline-lg": ["Roboto Flex"],
+            "title-lg": ["Roboto Flex"],
+            "label-sm": ["Roboto Flex"],
+            "body-lg": ["Roboto Flex"],
+            "display-hero": ["Roboto Flex"],
+            "title-md": ["Roboto Flex"],
+            "headline-sm": ["Roboto Flex"],
+            "label-lg": ["Roboto Flex"],
+            "display-hero-mobile": ["Roboto Flex"]
+          },
+          "fontSize": {
+            "headline-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "title-lg": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-hero": ["96px", { "lineHeight": "96px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "display-hero-mobile": ["64px", { "lineHeight": "68px", "letterSpacing": "-0.03em", "fontWeight": "300" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-ghost-border {
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    @keyframes smoothRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .hand-smooth-sec {
+      animation: smoothRotate 60s linear infinite;
+      transform-origin: 50% 50%;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col justify-between pb-28 md:pb-8">
+<!-- Top App Bar (Shared Component Execution) -->
+<header class="flex justify-between items-center w-full px-space-md h-16 bg-background dark:bg-background sticky top-0 z-40">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Alarm icon" class="p-2 rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 transition-transform text-on-surface">
+<span class="material-symbols-outlined text-primary dark:text-primary">alarm</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm font-medium text-on-surface dark:text-on-surface tracking-tight">Clock</h1>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Search cities" class="p-2 rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 transition-transform text-on-surface">
+<span class="material-symbols-outlined text-outline">search</span>
+</button>
+<button aria-label="More options" class="p-2 rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 transition-transform text-on-surface">
+<span class="material-symbols-outlined text-outline">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="w-full max-w-4xl mx-auto px-space-md md:px-margin space-y-space-lg flex-1">
+<!-- Hero Local Time Section (Bento Grid Asymmetry) -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-space-md pt-space-xs">
+<!-- Primary Digital & Contextual Glance Card -->
+<div class="md:col-span-7 bg-surface-container-low rounded-lg p-space-lg custom-ghost-border flex flex-col justify-between relative overflow-hidden group">
+<!-- Ambient Subtle Glow Pill -->
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="flex items-center justify-between z-10">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/40 text-secondary border border-secondary/20">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-label-md font-label-md font-medium tracking-wide">Home</span>
+</div>
+<!-- Local Weather Snippet Pill -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined text-tertiary text-[18px]" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+<span class="text-label-md font-label-md">72°F Sunny</span>
+</div>
+</div>
+<!-- Big Hero Time & Info -->
+<div class="my-space-md md:my-space-lg z-10">
+<div class="flex items-baseline gap-2">
+<span class="text-display-hero-mobile md:text-display-hero font-display-hero-mobile md:font-display-hero text-on-surface tracking-tighter">10:42</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container text-label-md font-label-md uppercase font-bold">AM</span>
+</div>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="text-body-lg font-body-lg">Wed, Oct 23</span>
+<span class="text-outline mx-1">•</span>
+<span class="text-body-md font-body-md text-outline">San Francisco, CA</span>
+</div>
+</div>
+<!-- Time Zone & Daylight Summary Subtext -->
+<div class="flex items-center justify-between pt-space-md border-t border-white/[0.04] text-label-md font-label-md text-outline">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Pacific Daylight Time (GMT-7)</span>
+</div>
+<span class="text-tertiary font-medium">Sunrise in 8h 12m</span>
+</div>
+</div>
+<!-- Live Material 3 Expressive Analog Clock Widget -->
+<div class="md:col-span-5 bg-surface-container-low rounded-lg p-space-md custom-ghost-border flex flex-col items-center justify-center relative min-h-[220px]">
+<div class="relative w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center">
+<!-- Outer Dial Ring -->
+<div class="absolute inset-0 rounded-full border-2 border-surface-container-highest bg-surface-container-lowest/60 flex items-center justify-center shadow-inner">
+<!-- Hour Markers Subtle Pill Marks -->
+<div class="absolute top-2 w-1.5 h-3.5 bg-primary-container/80 rounded-full"></div>
+<div class="absolute bottom-2 w-1.5 h-3.5 bg-outline-variant rounded-full"></div>
+<div class="absolute right-2 w-3.5 h-1.5 bg-outline-variant rounded-full"></div>
+<div class="absolute left-2 w-3.5 h-1.5 bg-outline-variant rounded-full"></div>
+<!-- Dial Ambient Center Ring -->
+<div class="w-24 h-24 rounded-full border border-surface-container-high/60 bg-surface-container/30"></div>
+</div>
+<!-- SVG Smooth Kinetic Clock Hands -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" viewbox="0 0 100 100">
+<!-- Hour Hand: pointing to ~10:42 (~321 deg) -->
+<line stroke="#ffdcc5" stroke-linecap="round" stroke-width="4.5" x1="50" x2="31" y1="50" y2="28"></line>
+<!-- Minute Hand: pointing to 42 min (~252 deg) -->
+<line stroke="#ffb782" stroke-linecap="round" stroke-width="3" x1="50" x2="16" y1="50" y2="61"></line>
+<!-- Second Hand Continuous Rotation -->
+<g class="hand-smooth-sec">
+<line stroke="#f5e1a7" stroke-linecap="round" stroke-width="1.5" x1="50" x2="50" y1="62" y2="12"></line>
+<circle cx="50" cy="50" fill="#f5e1a7" r="3"></circle>
+</g>
+</svg>
+<!-- Central Pivot Nut -->
+<div class="w-3.5 h-3.5 rounded-full bg-on-primary ring-2 ring-primary-container z-20"></div>
+</div>
+<div class="mt-space-sm flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="text-label-sm font-label-sm text-outline tracking-wider uppercase">Live Sync</span>
+</div>
+</div>
+</section>
+<!-- World Clocks Header & Search Bar -->
+<section class="space-y-space-md pt-2">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-title-lg font-title-lg text-on-surface">World Clocks</h2>
+<p class="text-body-md font-body-md text-outline">3 pinned international hubs</p>
+</div>
+<!-- Quick Add City Pill Button (Desktop / Tablet view) -->
+<button class="hidden sm:inline-flex items-center gap-2 px-space-md py-2.5 rounded-full bg-surface-container-high hover:bg-surface-bright text-primary text-label-lg font-label-lg transition-colors active:scale-95 duration-150 custom-ghost-border">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add City</span>
+</button>
+</div>
+<!-- World Clock Cards List -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<!-- Card 1: Tokyo, Japan -->
+<article class="bg-surface-container-low hover:bg-surface-container rounded-lg p-space-md custom-ghost-border transition-all duration-200 flex flex-col justify-between group">
+<div>
+<div class="flex items-start justify-between">
+<div>
+<h3 class="text-title-lg font-title-lg text-on-surface">Tokyo</h3>
+<p class="text-body-md font-body-md text-outline">Japan</p>
+</div>
+<!-- Day/Night Badge Pill -->
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px] text-secondary">bedtime</span>
+<span>Night</span>
+</span>
+</div>
+<!-- Main Time Display -->
+<div class="my-space-md flex items-baseline justify-between">
+<span class="text-headline-lg font-headline-lg text-on-surface tracking-tight group-hover:text-primary transition-colors">02:42</span>
+<span class="text-label-md font-label-md text-outline font-semibold">AM</span>
+</div>
+</div>
+<div class="pt-space-sm border-t border-white/[0.04] flex items-center justify-between text-body-md font-body-md">
+<span class="text-label-md font-label-md text-secondary">Tomorrow, +16 hrs</span>
+<!-- Weather Tag -->
+<div class="inline-flex items-center gap-1 text-on-surface-variant text-label-md font-label-md">
+<span class="material-symbols-outlined text-[16px] text-outline">rainy</span>
+<span>18°C Rain</span>
+</div>
+</div>
+</article>
+<!-- Card 2: London, United Kingdom -->
+<article class="bg-surface-container-low hover:bg-surface-container rounded-lg p-space-md custom-ghost-border transition-all duration-200 flex flex-col justify-between group">
+<div>
+<div class="flex items-start justify-between">
+<div>
+<h3 class="text-title-lg font-title-lg text-on-surface">London</h3>
+<p class="text-body-md font-body-md text-outline">United Kingdom</p>
+</div>
+<!-- Day/Night Badge Pill -->
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container/30 text-secondary text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px]">wb_twilight</span>
+<span>Evening</span>
+</span>
+</div>
+<!-- Main Time Display -->
+<div class="my-space-md flex items-baseline justify-between">
+<span class="text-headline-lg font-headline-lg text-on-surface tracking-tight group-hover:text-primary transition-colors">18:42</span>
+<span class="text-label-md font-label-md text-outline font-semibold">PM</span>
+</div>
+</div>
+<div class="pt-space-sm border-t border-white/[0.04] flex items-center justify-between text-body-md font-body-md">
+<span class="text-label-md font-label-md text-on-surface-variant">Today, +8 hrs</span>
+<!-- Weather Tag -->
+<div class="inline-flex items-center gap-1 text-on-surface-variant text-label-md font-label-md">
+<span class="material-symbols-outlined text-[16px] text-outline">cloud</span>
+<span>14°C Cloudy</span>
+</div>
+</div>
+</article>
+<!-- Card 3: New York, USA -->
+<article class="bg-surface-container-low hover:bg-surface-container rounded-lg p-space-md custom-ghost-border transition-all duration-200 flex flex-col justify-between group">
+<div>
+<div class="flex items-start justify-between">
+<div>
+<h3 class="text-title-lg font-title-lg text-on-surface">New York</h3>
+<p class="text-body-md font-body-md text-outline">USA</p>
+</div>
+<!-- Day/Night Badge Pill -->
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+<span>Day</span>
+</span>
+</div>
+<!-- Main Time Display -->
+<div class="my-space-md flex items-baseline justify-between">
+<span class="text-headline-lg font-headline-lg text-on-surface tracking-tight group-hover:text-primary transition-colors">01:42</span>
+<span class="text-label-md font-label-md text-outline font-semibold">PM</span>
+</div>
+</div>
+<div class="pt-space-sm border-t border-white/[0.04] flex items-center justify-between text-body-md font-body-md">
+<span class="text-label-md font-label-md text-on-surface-variant">Today, +3 hrs</span>
+<!-- Weather Tag -->
+<div class="inline-flex items-center gap-1 text-on-surface-variant text-label-md font-label-md">
+<span class="material-symbols-outlined text-[16px] text-tertiary">sunny</span>
+<span>21°C Clear</span>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Time Comparison Slider Glance Strip (Material 3 Expressive Utility) -->
+<section class="bg-surface-container-high/60 rounded-lg p-space-md custom-ghost-border flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">public</span>
+</div>
+<div>
+<h4 class="text-title-md font-title-md text-on-surface">Coordinate Meeting</h4>
+<p class="text-body-md font-body-md text-outline">Find overlapping waking hours across 4 cities</p>
+</div>
+</div>
+<button class="w-full sm:w-auto px-5 py-2.5 rounded-full bg-surface-container-highest hover:bg-surface-bright text-on-surface text-label-lg font-label-lg transition-colors active:scale-95 duration-150">
+        Compare Times
+      </button>
+</section>
+</main>
+<!-- Material 3 Floating Action Button (FAB) for Add City -->
+<aside class="fixed right-6 bottom-24 z-40">
+<button aria-label="Add city to world clock" class="w-16 h-16 rounded-[24px] bg-primary-container text-on-primary-container shadow-2xl flex items-center justify-center hover:shadow-[0_12px_32px_-6px_rgba(0,0,0,0.7),0_4px_12px_0px_rgba(255,183,130,0.25)] active:scale-95 transition-all duration-150 group">
+<span class="material-symbols-outlined text-[28px] transition-transform duration-200 group-hover:rotate-90 text-on-primary">add</span>
+</button>
+</aside>
+<!-- Bottom Navigation Bar (Executed strictly from Shared Components JSON) -->
+<!-- Target screen is Clock (World Clock), so "Clock" tab has style_active_navigation applied -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-space-sm pb-safe bg-surface-container dark:bg-surface-container">
+<!-- Item 1: Alarm -->
+<button class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="icon-pill inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">alarm</span>
+</span>
+<span>Alarm</span>
+</button>
+<!-- Item 2: Clock (ACTIVE MATCH) -->
+<button class="flex flex-col items-center justify-center gap-1 text-on-surface dark:text-on-surface font-label-md text-label-md [&amp;_span.icon-pill]:bg-secondary-container dark:[&amp;_span.icon-pill]:bg-secondary-container [&amp;_span.icon-pill]:text-primary-container dark:[&amp;_span.icon-pill]:text-primary-container [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 [&amp;_span.icon-pill]:rounded-full hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="icon-pill inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</span>
+<span class="font-medium text-primary-container">Clock</span>
+</button>
+<!-- Item 3: Timer -->
+<button class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="icon-pill inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">timer</span>
+</span>
+<span>Timer</span>
+</button>
+<!-- Item 4: Stopwatch -->
+<button class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="icon-pill inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">timer_10</span>
+</span>
+<span>Stopwatch</span>
+</button>
+</nav>
+</body></html>

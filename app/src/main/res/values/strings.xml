@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Chronos</string>
+
+    <string name="tab_alarm">Alarm</string>
+    <string name="tab_clock">Clock</string>
+    <string name="tab_timer">Timer</string>
+    <string name="tab_stopwatch">Stopwatch</string>
+
+    <string name="channel_alarms">Alarms</string>
+    <string name="channel_alarms_desc">Alarms that are currently ringing</string>
+    <string name="channel_timers">Timers</string>
+    <string name="channel_timers_desc">Running countdown timers</string>
+</resources>

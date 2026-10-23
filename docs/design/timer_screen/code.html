@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clock - Timer</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Roboto Flex -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#d8c58d",
+            "inverse-on-surface": "#2f3133",
+            "on-secondary-container": "#d8afa4",
+            "outline": "#9f8d82",
+            "primary": "#ffdcc5",
+            "on-tertiary": "#3b2f05",
+            "tertiary": "#f5e1a7",
+            "tertiary-fixed": "#f5e1a7",
+            "inverse-surface": "#e2e2e5",
+            "error": "#ffb4ab",
+            "secondary": "#e7bdb1",
+            "background": "#121416",
+            "secondary-container": "#604239",
+            "on-primary-fixed-variant": "#6b3a10",
+            "outline-variant": "#52443b",
+            "surface-bright": "#37393b",
+            "secondary-fixed": "#ffdbd0",
+            "on-primary-container": "#79461b",
+            "surface-container-lowest": "#0c0e10",
+            "on-primary": "#4f2500",
+            "surface-container": "#1e2022",
+            "on-secondary-fixed": "#2c150e",
+            "surface-container-low": "#1a1c1e",
+            "surface-container-high": "#282a2c",
+            "error-container": "#93000a",
+            "on-tertiary-fixed": "#231b00",
+            "on-tertiary-container": "#5f5124",
+            "surface-tint": "#ffb782",
+            "surface-variant": "#333537",
+            "primary-container": "#ffb782",
+            "secondary-fixed-dim": "#e7bdb1",
+            "on-error": "#690005",
+            "on-primary-fixed": "#301400",
+            "surface-dim": "#121416",
+            "on-background": "#e2e2e5",
+            "surface": "#121416",
+            "on-error-container": "#ffdad6",
+            "primary-fixed": "#ffdcc5",
+            "inverse-primary": "#875125",
+            "on-surface": "#e2e2e5",
+            "on-secondary-fixed-variant": "#5d4037",
+            "surface-container-highest": "#333537",
+            "primary-fixed-dim": "#ffb782",
+            "on-tertiary-fixed-variant": "#53461a",
+            "tertiary-fixed-dim": "#d8c58d",
+            "on-secondary": "#442a22",
+            "on-surface-variant": "#d7c3b6"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "margin": "1.5rem",
+            "gutter-mobile": "0.75rem",
+            "margin-mobile": "1rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-lg-mobile": ["Roboto Flex"],
+            "headline-md": ["Roboto Flex"],
+            "body-md": ["Roboto Flex"],
+            "label-md": ["Roboto Flex"],
+            "headline-lg": ["Roboto Flex"],
+            "title-lg": ["Roboto Flex"],
+            "label-sm": ["Roboto Flex"],
+            "body-lg": ["Roboto Flex"],
+            "display-hero": ["Roboto Flex"],
+            "title-md": ["Roboto Flex"],
+            "headline-sm": ["Roboto Flex"],
+            "label-lg": ["Roboto Flex"],
+            "display-hero-mobile": ["Roboto Flex"]
+          },
+          "fontSize": {
+            "headline-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "title-lg": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-hero": ["96px", { "lineHeight": "96px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "display-hero-mobile": ["64px", { "lineHeight": "68px", "letterSpacing": "-0.03em", "fontWeight": "300" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Ring animation transition */
+    #progress-ring {
+      transition: stroke-dashoffset 0.8s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased selection:bg-secondary-container selection:text-primary min-h-screen flex flex-col justify-between">
+<!-- Top App Bar (From Shared Components JSON) -->
+<header class="bg-background dark:bg-background flex justify-between items-center w-full px-space-md h-16 sticky top-0 z-40">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline" data-icon="alarm">alarm</span>
+<h1 class="text-headline-sm font-headline-sm font-medium text-on-surface dark:text-on-surface">Clock</h1>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Add Timer" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<button aria-label="More options" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas / Scrollable Container -->
+<main class="flex-1 w-full max-w-2xl mx-auto px-space-md pb-28 flex flex-col items-center">
+<!-- Active Timer Card / Glance Section -->
+<section class="w-full flex flex-col items-center pt-2 pb-6">
+<!-- Multi-timer Tab Capsule Indicator -->
+<div class="flex items-center gap-2 mb-4 bg-surface-container-low px-3 py-1.5 rounded-full border border-surface-container-high/40">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">1 of 2 Timers Running</span>
+<button class="ml-1 text-primary hover:underline text-label-sm font-label-sm">View all</button>
+</div>
+<!-- Circular Progress Ring & Centered Countdown Readout -->
+<div class="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center my-2">
+<!-- SVG Gauge -->
+<svg class="w-full h-full transform -rotate-90 drop-shadow-[0_4px_20px_rgba(255,183,130,0.15)]" viewbox="0 0 280 280">
+<!-- Background track -->
+<circle cx="140" cy="140" fill="transparent" r="122" stroke="#282A2C" stroke-width="8"></circle>
+<!-- Luminous Active Stroke -->
+<circle cx="140" cy="140" fill="transparent" id="progress-ring" r="122" stroke="#FFB782" stroke-dasharray="766.5" stroke-dashoffset="210" stroke-linecap="round" stroke-width="9"></circle>
+</svg>
+<!-- Center Readout -->
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center select-none">
+<span class="text-label-lg font-label-lg text-primary tracking-wide mb-1 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]" data-icon="restaurant">restaurant</span>
+            Pasta timer
+          </span>
+<div class="text-display-hero-mobile sm:text-display-hero font-display-hero-mobile sm:font-display-hero text-on-surface font-light tracking-tighter">
+            14:28
+          </div>
+<div class="text-label-sm font-label-sm text-outline mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="notifications_active">notifications_active</span>
+            14:42
+          </div>
+</div>
+</div>
+<!-- Quick Add Time Pills -->
+<div class="flex items-center gap-3 mt-4 mb-8">
+<button class="h-9 px-4 rounded-full bg-surface-container-high text-on-surface hover:bg-surface-bright transition-colors active:scale-95 duration-150 flex items-center gap-1 border border-outline-variant/30">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="add">add</span>
+<span class="text-label-md font-label-md">+1:00</span>
+</button>
+<button class="h-9 px-4 rounded-full bg-surface-container-high text-on-surface hover:bg-surface-bright transition-colors active:scale-95 duration-150 flex items-center gap-1 border border-outline-variant/30">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="add">add</span>
+<span class="text-label-md font-label-md">+5:00</span>
+</button>
+<button class="h-9 px-3 rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150 flex items-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span>
+</button>
+</div>
+<!-- Primary Timer Action Row (Reset, Play/Pause, Cancel) -->
+<div class="w-full max-w-xs flex items-center justify-between px-4">
+<!-- Reset Action -->
+<button aria-label="Reset Timer" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:bg-surface-bright transition-all active:scale-90 duration-150 shadow-md">
+<span class="material-symbols-outlined text-[24px]" data-icon="replay">replay</span>
+</button>
+<!-- Big Play / Pause Squircle FAB -->
+<button aria-label="Pause Timer" class="w-20 h-20 rounded-[28px] bg-primary-container text-on-primary-container flex items-center justify-center hover:brightness-105 active:scale-95 transition-all duration-150 shadow-[0_12px_32px_-6px_rgba(0,0,0,0.7),0_4px_12px_0px_rgba(255,183,130,0.2)]">
+<span class="material-symbols-outlined text-[36px] fill-icon" data-icon="pause">pause</span>
+</button>
+<!-- Cancel Action -->
+<button aria-label="Delete Timer" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:bg-surface-bright transition-all active:scale-90 duration-150 shadow-md">
+<span class="material-symbols-outlined text-[24px]" data-icon="close">close</span>
+</button>
+</div>
+</section>
+<!-- Secondary Running Background Timer (Concurrent Timer feature) -->
+<section class="w-full mt-2 mb-6">
+<div class="w-full bg-surface-container-low rounded-lg p-space-md border border-white/[0.04] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="timer">timer</span>
+</div>
+<div>
+<div class="text-body-lg font-body-lg text-on-surface font-medium">Laundry</div>
+<div class="text-label-sm font-label-sm text-outline">08:15 remaining</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button aria-label="Pause laundry timer" class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:bg-surface-bright active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="pause">pause</span>
+</button>
+<button aria-label="Stop laundry timer" class="w-9 h-9 rounded-full bg-surface-container-high text-outline hover:text-on-surface flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]" data-icon="close">close</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Presets & Quick Launch Bento Section -->
+<section class="w-full mb-6">
+<div class="flex items-center justify-between mb-3 px-1">
+<h2 class="text-title-md font-title-md text-on-surface font-medium">Presets</h2>
+<button class="text-label-md font-label-md text-primary flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span>
+          New preset
+        </button>
+</div>
+<!-- Bento Preset Grid -->
+<div class="grid grid-cols-2 gap-3 w-full">
+<!-- Preset Item 1: Tea -->
+<div class="bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between border border-white/[0.04] hover:bg-surface-container transition-colors duration-150 group">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-tertiary-fixed text-[22px]" data-icon="local_cafe">local_cafe</span>
+<button aria-label="Start Tea Timer" class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined text-[18px] fill-icon" data-icon="play_arrow">play_arrow</span>
+</button>
+</div>
+<div class="mt-4">
+<div class="text-headline-md font-headline-md text-on-surface font-light">3:00</div>
+<div class="text-label-md font-label-md text-outline">Tea</div>
+</div>
+</div>
+<!-- Preset Item 2: Eggs -->
+<div class="bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between border border-white/[0.04] hover:bg-surface-container transition-colors duration-150 group">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-secondary text-[22px]" data-icon="egg">egg</span>
+<button aria-label="Start Eggs Timer" class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined text-[18px] fill-icon" data-icon="play_arrow">play_arrow</span>
+</button>
+</div>
+<div class="mt-4">
+<div class="text-headline-md font-headline-md text-on-surface font-light">5:00</div>
+<div class="text-label-md font-label-md text-outline">Eggs</div>
+</div>
+</div>
+<!-- Preset Item 3: Meditation -->
+<div class="bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between border border-white/[0.04] hover:bg-surface-container transition-colors duration-150 group">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-primary text-[22px]" data-icon="self_improvement">self_improvement</span>
+<button aria-label="Start Meditation Timer" class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined text-[18px] fill-icon" data-icon="play_arrow">play_arrow</span>
+</button>
+</div>
+<div class="mt-4">
+<div class="text-headline-md font-headline-md text-on-surface font-light">10:00</div>
+<div class="text-label-md font-label-md text-outline">Meditation</div>
+</div>
+</div>
+<!-- Preset Item 4: Pomodoro -->
+<div class="bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between border border-white/[0.04] hover:bg-surface-container transition-colors duration-150 group">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[22px]" data-icon="hourglass_top">hourglass_top</span>
+<button aria-label="Start Pomodoro Timer" class="w-8 h-8 rounded-full bg-surface-container-high text-primary flex items-center justify-center opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined text-[18px] fill-icon" data-icon="play_arrow">play_arrow</span>
+</button>
+</div>
+<div class="mt-4">
+<div class="text-headline-md font-headline-md text-on-surface font-light">25:00</div>
+<div class="text-label-md font-label-md text-outline">Pomodoro</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (From Shared Components JSON) -->
+<!-- Contextual Active: 'Timer' is active -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-space-sm pb-safe bg-surface-container dark:bg-surface-container">
+<!-- Tab 1: Alarm (Inactive) -->
+<a class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150" href="#">
+<span class="icon-pill px-5 py-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]" data-icon="alarm">alarm</span>
+</span>
+<span>Alarm</span>
+</a>
+<!-- Tab 2: Clock (Inactive) -->
+<a class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150" href="#">
+<span class="icon-pill px-5 py-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]" data-icon="schedule">schedule</span>
+</span>
+<span>Clock</span>
+</a>
+<!-- Tab 3: Timer (ACTIVE TAB MATCHING CURRENT INTENT) -->
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface dark:text-on-surface font-label-md text-label-md hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150" href="#">
+<span class="icon-pill bg-secondary-container dark:bg-secondary-container text-primary-container dark:text-primary-container px-5 py-1 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px] fill-icon" data-icon="timer">timer</span>
+</span>
+<span>Timer</span>
+</a>
+<!-- Tab 4: Stopwatch (Inactive) -->
+<a class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150" href="#">
+<span class="icon-pill px-5 py-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]" data-icon="timer_10">timer_10</span>
+</span>
+<span>Stopwatch</span>
+</a>
+</nav>
+</body></html>

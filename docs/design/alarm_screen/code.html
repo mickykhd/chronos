@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Material You Clock - Alarm</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#d8c58d",
+            "inverse-on-surface": "#2f3133",
+            "on-secondary-container": "#d8afa4",
+            "outline": "#9f8d82",
+            "primary": "#ffdcc5",
+            "on-tertiary": "#3b2f05",
+            "tertiary": "#f5e1a7",
+            "tertiary-fixed": "#f5e1a7",
+            "inverse-surface": "#e2e2e5",
+            "error": "#ffb4ab",
+            "secondary": "#e7bdb1",
+            "background": "#121416",
+            "secondary-container": "#604239",
+            "on-primary-fixed-variant": "#6b3a10",
+            "outline-variant": "#52443b",
+            "surface-bright": "#37393b",
+            "secondary-fixed": "#ffdbd0",
+            "on-primary-container": "#79461b",
+            "surface-container-lowest": "#0c0e10",
+            "on-primary": "#4f2500",
+            "surface-container": "#1e2022",
+            "on-secondary-fixed": "#2c150e",
+            "surface-container-low": "#1a1c1e",
+            "surface-container-high": "#282a2c",
+            "error-container": "#93000a",
+            "on-tertiary-fixed": "#231b00",
+            "on-tertiary-container": "#5f5124",
+            "surface-tint": "#ffb782",
+            "surface-variant": "#333537",
+            "primary-container": "#ffb782",
+            "secondary-fixed-dim": "#e7bdb1",
+            "on-error": "#690005",
+            "on-primary-fixed": "#301400",
+            "surface-dim": "#121416",
+            "on-background": "#e2e2e5",
+            "surface": "#121416",
+            "on-error-container": "#ffdad6",
+            "primary-fixed": "#ffdcc5",
+            "inverse-primary": "#875125",
+            "on-surface": "#e2e2e5",
+            "on-secondary-fixed-variant": "#5d4037",
+            "surface-container-highest": "#333537",
+            "primary-fixed-dim": "#ffb782",
+            "on-tertiary-fixed-variant": "#53461a",
+            "tertiary-fixed-dim": "#d8c58d",
+            "on-secondary": "#442a22",
+            "on-surface-variant": "#d7c3b6"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "margin": "1.5rem",
+            "gutter-mobile": "0.75rem",
+            "margin-mobile": "1rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-lg-mobile": ["Roboto Flex"],
+            "headline-md": ["Roboto Flex"],
+            "body-md": ["Roboto Flex"],
+            "label-md": ["Roboto Flex"],
+            "headline-lg": ["Roboto Flex"],
+            "title-lg": ["Roboto Flex"],
+            "label-sm": ["Roboto Flex"],
+            "body-lg": ["Roboto Flex"],
+            "display-hero": ["Roboto Flex"],
+            "title-md": ["Roboto Flex"],
+            "headline-sm": ["Roboto Flex"],
+            "label-lg": ["Roboto Flex"],
+            "display-hero-mobile": ["Roboto Flex"]
+          },
+          "fontSize": {
+            "headline-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "title-lg": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-hero": ["96px", { "lineHeight": "96px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "headline-sm": ["22px", { "lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "display-hero-mobile": ["64px", { "lineHeight": "68px", "letterSpacing": "-0.03em", "fontWeight": "300" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    /* Subtle touch microinteraction */
+    .touch-ripple {
+      transition: transform 0.15s ease, background-color 0.2s ease;
+    }
+    .touch-ripple:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen pb-36">
+<!-- TOP APP BAR (Shared Components JSON Anchor) -->
+<header class="sticky top-0 z-40 bg-background dark:bg-background">
+<div class="flex justify-between items-center w-full px-space-md h-16 max-w-xl mx-auto">
+<div class="flex items-center gap-3">
+<button aria-label="Alarm icon" class="p-2 -ml-2 rounded-full hover:bg-surface-container-high text-on-surface active:scale-95 transition-transform duration-150 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="alarm">alarm</span>
+</button>
+<span class="text-headline-sm font-headline-sm font-medium text-on-surface tracking-tight">Clock</span>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="More options" class="p-2 rounded-full hover:bg-surface-container-high text-outline hover:text-on-surface active:scale-95 transition-all duration-150 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS / SCROLL VIEW -->
+<main class="max-w-xl mx-auto px-space-md space-y-4 pt-1">
+<!-- UPCOMING ALARM BANNER (Expressive Pill Banner) -->
+<section class="bg-surface-container-high/80 backdrop-blur-md rounded-lg p-space-md border border-white/[0.04] shadow-sm flex items-center justify-between gap-4">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-10 h-10 rounded-full bg-secondary-container/60 text-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications_active" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+</div>
+<div class="truncate">
+<p class="text-label-sm font-label-sm text-outline tracking-wider uppercase">Upcoming Alarm</p>
+<h2 class="text-title-md font-title-md text-on-surface truncate">Alarm in 6 hr 24 min</h2>
+</div>
+</div>
+<div class="flex items-center gap-1 shrink-0">
+<button class="px-3 py-1.5 rounded-full hover:bg-surface-bright text-primary text-label-md font-label-md active:scale-95 transition-all touch-ripple">
+          Dismiss
+        </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-bright text-on-surface text-label-md font-label-md active:scale-95 transition-all touch-ripple">
+          Change
+        </button>
+</div>
+</section>
+<!-- ALARM CARDS LIST -->
+<div class="space-y-3.5">
+<!-- CARD 1: 07:00 AM (ACTIVE / EXPANDED WORK ALARM) -->
+<article class="bg-surface-container-high rounded-[28px] p-space-md sm:p-5 border border-white/[0.06] transition-all duration-200">
+<!-- Top Row: Time, Toggle & Label -->
+<div class="flex items-start justify-between gap-4">
+<div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-lg-mobile sm:text-headline-lg font-headline-lg text-primary tracking-tight font-medium">07:00</span>
+<span class="text-title-md font-title-md text-secondary font-medium tracking-wide">AM</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="text-title-md font-title-md text-on-surface font-medium">Work / Weekdays</span>
+<span class="inline-block w-1 h-1 rounded-full bg-outline"></span>
+<span class="text-body-md font-body-md text-outline">Tomorrow</span>
+</div>
+</div>
+<!-- M3 Material Switch (ON State - Coral/Primary glow) -->
+<button aria-checked="true" class="relative inline-flex h-8 w-13 w-[52px] shrink-0 cursor-pointer rounded-full bg-primary-container p-1 transition-colors duration-200 ease-in-out focus:outline-none" role="switch" type="button">
+<span class="translate-x-5 pointer-events-none inline-block h-6 w-6 rounded-full bg-on-primary shadow-sm transform transition duration-200 ease-in-out flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-primary-container font-bold" data-icon="check">check</span>
+</span>
+</button>
+</div>
+<!-- Day Pills (M T W T F Active, S S Dimmed) -->
+<div class="flex items-center gap-1.5 mt-4">
+<span class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container text-label-md font-label-md flex items-center justify-center font-bold">M</span>
+<span class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container text-label-md font-label-md flex items-center justify-center font-bold">T</span>
+<span class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container text-label-md font-label-md flex items-center justify-center font-bold">W</span>
+<span class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container text-label-md font-label-md flex items-center justify-center font-bold">T</span>
+<span class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container text-label-md font-label-md flex items-center justify-center font-bold">F</span>
+<span class="w-8 h-8 rounded-full bg-surface-container text-outline text-label-md font-label-md flex items-center justify-center">S</span>
+<span class="w-8 h-8 rounded-full bg-surface-container text-outline text-label-md font-label-md flex items-center justify-center">S</span>
+</div>
+<!-- Expanded details / Chips (Assistant Routine & Dawn Chorus Sound) -->
+<div class="mt-4 pt-3.5 border-t border-outline-variant/30 flex flex-wrap items-center justify-between gap-2.5">
+<div class="flex flex-wrap items-center gap-2">
+<!-- Sound Chip -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-bright text-on-surface text-label-md font-label-md touch-ripple">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container" data-icon="graphic_eq">graphic_eq</span>
+<span>Dawn Chorus</span>
+</button>
+<!-- Routine Chip -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-bright text-on-surface text-label-md font-label-md touch-ripple">
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="assistant" style="font-variation-settings: 'FILL' 1;">assistant</span>
+<span>Google Assistant</span>
+</button>
+<!-- Vibrate Active -->
+<span class="p-1.5 rounded-full bg-surface-container text-outline" title="Vibration enabled">
+<span class="material-symbols-outlined text-[16px]" data-icon="vibration">vibration</span>
+</span>
+</div>
+<!-- Collapse / Expand chevron -->
+<button aria-label="Collapse alarm details" class="p-1 rounded-full hover:bg-surface-bright text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_less">expand_less</span>
+</button>
+</div>
+</article>
+<!-- CARD 2: 08:30 AM (INACTIVE / WEEKEND BRUNCH) -->
+<article class="bg-surface-container-low rounded-[28px] p-space-md sm:p-5 border border-white/[0.03] transition-all duration-200">
+<div class="flex items-start justify-between gap-4">
+<div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-lg-mobile sm:text-headline-lg font-headline-lg text-outline/60 tracking-tight font-light">08:30</span>
+<span class="text-title-md font-title-md text-outline/40 font-normal">AM</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="text-title-md font-title-md text-outline font-medium">Weekend Brunch</span>
+<span class="inline-block w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-body-md font-body-md text-outline/70">Sat, Sun</span>
+</div>
+</div>
+<!-- M3 Material Switch (OFF State) -->
+<button aria-checked="false" class="relative inline-flex h-8 w-[52px] shrink-0 cursor-pointer rounded-full border-2 border-outline-variant bg-surface-container-high p-0.5 transition-colors duration-200 ease-in-out focus:outline-none" role="switch" type="button">
+<span class="translate-x-0.5 pointer-events-none inline-block h-6 w-6 rounded-full bg-outline shadow-sm transform transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="flex items-center justify-between mt-4">
+<!-- Day Pills (S S highlighted with subtle accent, Weekdays dim) -->
+<div class="flex items-center gap-1.5">
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">M</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">T</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">W</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">T</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">F</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-high text-secondary-fixed-dim text-label-md font-label-md flex items-center justify-center font-medium">S</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-high text-secondary-fixed-dim text-label-md font-label-md flex items-center justify-center font-medium">S</span>
+</div>
+<button aria-label="Expand alarm details" class="p-1 rounded-full hover:bg-surface-bright text-outline/60 hover:text-outline transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</article>
+<!-- CARD 3: 06:15 AM (INACTIVE / MORNING RUN) -->
+<article class="bg-surface-container-low rounded-[28px] p-space-md sm:p-5 border border-white/[0.03] transition-all duration-200">
+<div class="flex items-start justify-between gap-4">
+<div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-lg-mobile sm:text-headline-lg font-headline-lg text-outline/60 tracking-tight font-light">06:15</span>
+<span class="text-title-md font-title-md text-outline/40 font-normal">AM</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="text-title-md font-title-md text-outline font-medium">Morning Run</span>
+<span class="inline-block w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-body-md font-body-md text-outline/70">Mon, Wed, Fri</span>
+</div>
+</div>
+<!-- M3 Material Switch (OFF State) -->
+<button aria-checked="false" class="relative inline-flex h-8 w-[52px] shrink-0 cursor-pointer rounded-full border-2 border-outline-variant bg-surface-container-high p-0.5 transition-colors duration-200 ease-in-out focus:outline-none" role="switch" type="button">
+<span class="translate-x-0.5 pointer-events-none inline-block h-6 w-6 rounded-full bg-outline shadow-sm transform transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="flex items-center justify-between mt-4">
+<!-- Day Pills (M W F dimmed highlighted) -->
+<div class="flex items-center gap-1.5">
+<span class="w-8 h-8 rounded-full bg-surface-container-high text-secondary-fixed-dim text-label-md font-label-md flex items-center justify-center font-medium">M</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">T</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-high text-secondary-fixed-dim text-label-md font-label-md flex items-center justify-center font-medium">W</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">T</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-high text-secondary-fixed-dim text-label-md font-label-md flex items-center justify-center font-medium">F</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">S</span>
+<span class="w-8 h-8 rounded-full bg-surface-container-lowest text-outline/40 text-label-md font-label-md flex items-center justify-center">S</span>
+</div>
+<button aria-label="Expand alarm details" class="p-1 rounded-full hover:bg-surface-bright text-outline/60 hover:text-outline transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</article>
+<!-- CARD 4: BEDTIME MODE / SLEEP SCHEDULE INTEGRATION -->
+<article class="bg-surface-container-low rounded-[28px] p-space-md sm:p-5 border border-white/[0.04] relative overflow-hidden group">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3.5">
+<div class="w-12 h-12 rounded-2xl bg-secondary-container/50 text-secondary-fixed-dim flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[26px]" data-icon="bedtime" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-label-sm font-label-sm text-tertiary uppercase tracking-wider font-semibold">Sleep Schedule</span>
+</div>
+<h3 class="text-title-lg font-title-lg text-on-surface font-semibold mt-0.5">Bedtime Mode</h3>
+<p class="text-body-md font-body-md text-outline mt-0.5">Bedtime 11:00 PM • Wake up 07:00 AM</p>
+</div>
+</div>
+<button aria-label="Configure sleep schedule" class="p-2 rounded-full hover:bg-surface-bright text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_forward_ios">arrow_forward_ios</span>
+</button>
+</div>
+<!-- Mini Sleep Progress Bar Graphic -->
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between text-label-sm font-label-sm text-outline">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="hotel">hotel</span>
+<span>8 hrs of rest planned</span>
+</div>
+<span class="text-secondary font-medium hover:underline cursor-pointer">Change bedtime</span>
+</div>
+</article>
+</div>
+</main>
+<!-- FLOATING ACTION BUTTON (Add Alarm FAB) -->
+<aside class="fixed bottom-24 right-5 sm:right-[calc(50%-280px+1.25rem)] z-40">
+<button aria-label="Add new alarm" class="w-16 h-16 rounded-[24px] bg-primary-container text-on-primary-container flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200">
+<span class="material-symbols-outlined text-[32px] font-semibold" data-icon="add">add</span>
+</button>
+</aside>
+<!-- BOTTOM NAVIGATION BAR (Shared Components JSON Anchor) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-space-sm pb-safe bg-surface-container dark:bg-surface-container">
+<div class="flex justify-around items-center w-full max-w-xl mx-auto">
+<!-- Alarm Tab (ACTIVE DESTINATION) -->
+<button class="flex flex-col items-center justify-center gap-1 text-on-surface dark:text-on-surface font-label-md text-label-md [&amp;_span.icon-pill]:bg-secondary-container dark:[&amp;_span.icon-pill]:bg-secondary-container [&amp;_span.icon-pill]:text-primary-container dark:[&amp;_span.icon-pill]:text-primary-container [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 [&amp;_span.icon-pill]:rounded-full active:scale-95 transition-transform duration-150">
+<span class="icon-pill inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]" data-icon="alarm" style="font-variation-settings: 'FILL' 1;">alarm</span>
+</span>
+<span>Alarm</span>
+</button>
+<!-- Clock Tab -->
+<button class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="icon-pill inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]" data-icon="schedule">schedule</span>
+</span>
+<span>Clock</span>
+</button>
+<!-- Timer Tab -->
+<button class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="icon-pill inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]" data-icon="timer">timer</span>
+</span>
+<span>Timer</span>
+</button>
+<!-- Stopwatch Tab -->
+<button class="flex flex-col items-center justify-center gap-1 text-outline dark:text-outline font-label-md text-label-md [&amp;_span.icon-pill]:px-5 [&amp;_span.icon-pill]:py-1 hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150">
+<span class="icon-pill inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]" data-icon="timer_10">timer_10</span>
+</span>
+<span>Stopwatch</span>
+</button>
+</div>
+</nav>
+<!-- Lightweight interaction helper -->
+<script>
+    // Simple toggle simulation for switches to mirror native feel
+    document.querySelectorAll('[role="switch"]').forEach(switchEl => {
+      switchEl.addEventListener('click', () => {
+        const isChecked = switchEl.getAttribute('aria-checked') === 'true';
+        switchEl.setAttribute('aria-checked', !isChecked);
+        
+        if (!isChecked) {
+          switchEl.className = 'relative inline-flex h-8 w-[52px] shrink-0 cursor-pointer rounded-full bg-primary-container p-1 transition-colors duration-200 ease-in-out focus:outline-none';
+          switchEl.innerHTML = `<span class="translate-x-5 pointer-events-none inline-block h-6 w-6 rounded-full bg-on-primary shadow-sm transform transition duration-200 ease-in-out flex items-center justify-center"><span class="material-symbols-outlined text-[14px] text-primary-container font-bold" data-icon="check">check</span></span>`;
+        } else {
+          switchEl.className = 'relative inline-flex h-8 w-[52px] shrink-0 cursor-pointer rounded-full border-2 border-outline-variant bg-surface-container-high p-0.5 transition-colors duration-200 ease-in-out focus:outline-none';
+          switchEl.innerHTML = `<span class="translate-x-0.5 pointer-events-none inline-block h-6 w-6 rounded-full bg-outline shadow-sm transform transition duration-200 ease-in-out"></span>`;
+        }
+      });
+    });
+  </script>
+</body></html>

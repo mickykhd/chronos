@@ -1,0 +1,32 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signing material — never commit these
+keystore/
+keystore.properties
+*.jks
+*.keystore
+
+# Build artefacts
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Local tooling scratch space
+.build-tools/
+.screenshots/
+
+# OS
+.DS_Store
+Thumbs.db
