@@ -116,19 +116,11 @@ private fun ClockScreenContent(
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val isWide = maxWidth >= 600.dp
 
-        ChronosFab(
-            icon = "add",
-            contentDescription = "Add city to world clock",
-            rotateOnTap = true,
-            onClick = onAddCity,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 20.dp, bottom = 96.dp),
-        )
-
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(bottom = 120.dp),
+            // Extra clearance so the last card can scroll clear of the floating
+            // action button rather than being trapped underneath it.
+            contentPadding = PaddingValues(bottom = 200.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             stickyHeader(key = "topbar") {
@@ -242,6 +234,17 @@ private fun ClockScreenContent(
                 )
             }
         }
+
+        ChronosFab(
+            icon = "add",
+            contentDescription = "Add city to world clock",
+            rotateOnTap = true,
+            onClick = onAddCity,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 20.dp, bottom = 96.dp),
+        )
+
     }
 }
 
@@ -451,12 +454,14 @@ private fun CoordinateStrip(
                 tint = ChronosColors.Primary,
             )
         }
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = "Coordinate Meeting",
                 style = ChronosType.TitleMd,
                 color = ChronosColors.OnSurface,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             )
             Text(
                 text = "Find overlapping waking hours across $cityCount cities",
@@ -464,8 +469,12 @@ private fun CoordinateStrip(
                 color = ChronosColors.Outline,
             )
         }
-        Spacer(Modifier.width(12.dp))
-        ChronosTextButton(text = "Compare Times", onClick = onClick)
+        Spacer(Modifier.width(8.dp))
+        ChronosTextButton(
+            text = "Compare Times",
+            onClick = onClick,
+            horizontalPadding = 14.dp,
+        )
     }
 }
 

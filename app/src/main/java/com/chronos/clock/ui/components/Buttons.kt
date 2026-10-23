@@ -264,6 +264,7 @@ fun ChronosTextButton(
     leadingIcon: String? = null,
     container: Color = ChronosColors.SurfaceContainerHigh,
     contentColor: Color = ChronosColors.OnSurface,
+    horizontalPadding: Dp = 20.dp,
 ) {
     val press = rememberPressState()
     val containerColor by animateColorAsState(
@@ -286,7 +287,7 @@ fun ChronosTextButton(
                 },
             )
             .defaultMinSize(minHeight = 44.dp)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            .padding(horizontal = horizontalPadding, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
