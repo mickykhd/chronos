@@ -15,6 +15,10 @@ Android 8.0 (API 26) and newer.
 |---|---|---|
 | ![Ringing](docs/screenshots/alarm-ringing.png) | ![Settings](docs/screenshots/settings.png) | ![World clock](docs/screenshots/world-clock-list.png) |
 
+| Widgets | In the shade | Alarm sounds |
+|---|---|---|
+| ![Widgets](docs/screenshots/widgets.png) | ![Notifications](docs/screenshots/notifications.png) | ![Alarm sounds](docs/screenshots/alarm-sounds.png) |
+
 | Timer empty | New preset | Stopwatch idle |
 |---|---|---|
 | ![Timer empty](docs/screenshots/timer-empty.png) | ![New preset](docs/screenshots/new-preset.png) | ![Stopwatch idle](docs/screenshots/stopwatch-idle.png) |
@@ -22,6 +26,22 @@ Android 8.0 (API 26) and newer.
 📦 [Download the APK from the Releases page](https://github.com/mickykhd/chronos/releases)
 
 ---
+
+## Widgets
+
+Two home-screen widgets, both live:
+
+- **Chronos clock (4×2)** — the local time with an AM/PM badge, the date, your city and
+  the live conditions.
+- **Chronos analog (2×2)** — an analog dial drawn to a bitmap, with the day of the week.
+
+They are built with plain `RemoteViews` (no Glance), open the app on tap, and are
+redrawn just past every minute boundary by an alarm tick, because the system's own
+widget update period is capped at thirty minutes. A weather cache in the repository
+means the widgets can show conditions without a network round trip on every refresh.
+
+Add them from your launcher: long-press an empty spot, tap **Widgets**, search for
+**Chronos**.
 
 ## Features
 
