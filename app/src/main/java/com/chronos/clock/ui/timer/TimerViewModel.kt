@@ -9,6 +9,10 @@ import com.chronos.clock.data.TimerPreset
 import com.chronos.clock.service.TimerScheduler
 import com.chronos.clock.service.TimerService
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -20,7 +24,16 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application.applicationContext
 
     val timers = repository.timers
-    val presets: List<TimerPreset> = ChronosRepository.TimerPresets
+
+    /** Built-in presets plus any the user has created. */
+    val presets: StateFlow<List<TimerPreset>> =
+        repository.customPresets.map { custom -> ChronosRepository.TimerPresets + custom }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, ChronosRepository.TimerPresets)
+
+    /** A preset added through the "New preset" dialog. */
+    fun addCustomPreset(preset: TimerPreset) = repository.addCustomPreset(preset)
+
+    fun removeCustomPreset(id: String) = repository.removeCustomPreset(id)
 
     /** The timer the hero gauge is bound to: the first running one, else the first. */
     val activeTimer: RunningTimer?
@@ -71,6 +84,11 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
         repository.addTimer(timer)
         TimerScheduler.schedule(context, timer)
         TimerService.start(context)
+    }
+
+    /** Convenient single entry for the play/pause button. */
+    fun pauseOrResume(timer: RunningTimer) {
+        if (timer.running) pause(timer) else resume(timer)
     }
 
     fun pause(timer: RunningTimer) {

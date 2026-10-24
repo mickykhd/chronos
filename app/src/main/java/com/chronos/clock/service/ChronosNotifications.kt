@@ -20,9 +20,19 @@ object ChronosNotifications {
 
     const val ALARM_CHANNEL = "chronos_alarms"
     const val TIMER_CHANNEL = "chronos_timers"
+    const val TIMER_DONE_CHANNEL = "chronos_timers_done"
 
     const val TIMER_NOTIFICATION_ID = 4201
     const val ALARM_NOTIFICATION_ID = 4202
+
+    /**
+     * Finished timers get their own id: if they reused the running timer's id, the
+     * foreground service stopping would cancel the "time's up" notification the
+     * moment it posted.
+     */
+    private const val TIMERS_DONE_ID_BASE = 4400
+
+    fun timerDoneNotificationId(timerId: String) = TIMERS_DONE_ID_BASE + (timerId.hashCode() % 10_000)
 
     fun ensureChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -48,8 +58,18 @@ object ChronosNotifications {
             setShowBadge(false)
         }
 
+        val timersDone = NotificationChannel(
+            TIMER_DONE_CHANNEL,
+            context.getString(R.string.channel_timers_done),
+            NotificationManager.IMPORTANCE_HIGH,
+        ).apply {
+            description = context.getString(R.string.channel_timers_done_desc)
+            enableVibration(true)
+        }
+
         manager.createNotificationChannel(alarms)
         manager.createNotificationChannel(timers)
+        manager.createNotificationChannel(timersDone)
     }
 
     fun openAppIntent(context: Context, requestCode: Int, extra: String? = null): PendingIntent {
@@ -88,7 +108,17 @@ object ChronosNotifications {
 
     fun showTimerFinished(context: Context, timer: RunningTimer) {
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
-        manager.notify(TIMER_NOTIFICATION_ID, timerNotification(context, timer, ongoing = false))
+        val notification = NotificationCompat.Builder(context, TIMER_DONE_CHANNEL)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("${timer.label} · ${timer.remainingText()}")
+            .setContentText("Your ${timer.label} timer has finished")
+            .setContentIntent(openAppIntent(context, timer.id.hashCode()))
+            .setCategory(Notification.CATEGORY_ALARM)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setAutoCancel(true)
+            .build()
+        manager.notify(timerDoneNotificationId(timer.id), notification)
     }
 
     fun alarmNotification(context: Context, alarm: Alarm): Notification {

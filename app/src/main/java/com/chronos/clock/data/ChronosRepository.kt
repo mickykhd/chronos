@@ -37,6 +37,9 @@ class ChronosRepository(context: Context) {
     private val _timers = MutableStateFlow(read("timers", emptyList<RunningTimer>()))
     val timers: StateFlow<List<RunningTimer>> = _timers.asStateFlow()
 
+    private val _customPresets = MutableStateFlow(read("presets", emptyList<TimerPreset>()))
+    val customPresets: StateFlow<List<TimerPreset>> = _customPresets.asStateFlow()
+
     private val _laps = MutableStateFlow(read("laps", emptyList<Lap>()))
     val laps: StateFlow<List<Lap>> = _laps.asStateFlow()
 
@@ -123,6 +126,21 @@ class ChronosRepository(context: Context) {
      */
     fun updateTimersTransient(timers: List<RunningTimer>) {
         _timers.value = timers
+    }
+
+    // ------------------------------------------------------------- presets
+
+    /** The built-in presets followed by anything the user has added. */
+    fun allPresets(): List<TimerPreset> = TimerPresets + _customPresets.value
+
+    fun addCustomPreset(preset: TimerPreset) {
+        _customPresets.value = _customPresets.value + preset
+        persist("presets", _customPresets.value)
+    }
+
+    fun removeCustomPreset(id: String) {
+        _customPresets.value = _customPresets.value.filterNot { it.id == id }
+        persist("presets", _customPresets.value)
     }
 
     // --------------------------------------------------------------- laps

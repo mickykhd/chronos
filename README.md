@@ -15,6 +15,10 @@ Android 8.0 (API 26) and newer.
 |---|---|---|
 | ![Ringing](docs/screenshots/alarm-ringing.png) | ![Settings](docs/screenshots/settings.png) | ![World clock](docs/screenshots/world-clock-list.png) |
 
+| Timer empty | New preset | Stopwatch idle |
+|---|---|---|
+| ![Timer empty](docs/screenshots/timer-empty.png) | ![New preset](docs/screenshots/new-preset.png) | ![Stopwatch idle](docs/screenshots/stopwatch-idle.png) |
+
 📦 [Download the APK from the Releases page](https://github.com/mickykhd/chronos/releases)
 
 ---
@@ -59,15 +63,23 @@ Android 8.0 (API 26) and newer.
 - "Coordinate Meeting" sheet comparing waking hours across every pinned city.
 
 ### ⏲ Timer
-- Multiple **concurrent** countdowns, each with its own progress ring.
-- Presets (Tea, Eggs, Meditation, Pomodoro) plus `+1:00` / `+5:00` quick adds.
+- The empty state is a **start surface**: one-tap duration chips (+1m, +3m, +5m,
+  +10m) and the presets. No disabled, unresponsive controls are rendered when
+  there is nothing running.
+- Multiple **concurrent** countdowns, each with its own progress ring, with a
+  "View all" sheet when more than one is running.
+- Presets (Tea, Eggs, Meditation, Pomodoro), `+1:00` / `+5:00` quick adds, and
+  **your own presets** via a name-and-length dialog (deletable).
 - A **foreground service** keeps an ongoing notification with a live countdown.
   The completion event is also scheduled with `AlarmManager`, so the "time's up"
-  notification survives the app being killed.
+  notification survives the app being killed — and it posts on its own
+  high-importance channel, so it is not cancelled when the service stops and is
+  not buried at low importance.
 - Reset, pause/resume and cancel, with the ring animating to each new state.
 
 ### ⏱ Stopwatch
 - Millisecond-accurate timing with a 60-second sweep gauge and a tick ring.
+- The lap table and the Share action are **hidden until there is a lap** to record.
 - Lap table with **fastest lap** highlighted in tertiary brass and **slowest lap**
   in muted crimson, exactly as the design system specifies.
 - Share laps to any app via `ACTION_SEND`.

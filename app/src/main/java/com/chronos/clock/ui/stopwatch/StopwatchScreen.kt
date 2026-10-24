@@ -2,6 +2,7 @@ package com.chronos.clock.ui.stopwatch
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -105,6 +106,7 @@ fun StopwatchScreen(
                 elapsedMillis = viewModel.elapsedMillis,
                 running = viewModel.running,
                 lapCount = laps.size,
+                hasLaps = laps.isNotEmpty(),
                 onToggle = viewModel::toggle,
                 onLap = viewModel::lap,
                 onReset = viewModel::reset,
@@ -116,74 +118,77 @@ fun StopwatchScreen(
 
         item(key = "lap-header") {
             val reveal = rememberRevealState(index = 1)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 8.dp)
-                    .reveal(reveal),
+            AnimatedVisibility(
+                visible = laps.isNotEmpty(),
+                enter = fadeIn(animationSpec = tween(ChronosMotion.Medium1)) +
+                    expandVertically(animationSpec = spring(dampingRatio = 0.85f, stiffness = 320f)),
+                exit = fadeOut(animationSpec = tween(ChronosMotion.Short3)) +
+                    shrinkVertically(animationSpec = spring(dampingRatio = 0.85f, stiffness = 380f)),
             ) {
-                Text(
-                    text = "LAP",
-                    style = ChronosType.LabelMd,
-                    color = ChronosColors.Outline,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(
-                    text = "SPLIT",
-                    style = ChronosType.LabelMd,
-                    color = ChronosColors.Outline,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(
-                    text = "OVERALL",
-                    style = ChronosType.LabelMd,
-                    color = ChronosColors.Outline,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.weight(1f),
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 8.dp)
+                        .reveal(reveal),
+                ) {
+                    Text(
+                        text = "LAP",
+                        style = ChronosType.LabelMd,
+                        color = ChronosColors.Outline,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = "SPLIT",
+                        style = ChronosType.LabelMd,
+                        color = ChronosColors.Outline,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = "OVERALL",
+                        style = ChronosType.LabelMd,
+                        color = ChronosColors.Outline,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
-        }
-
-        items(laps.reversed(), key = { it.index }) { lap ->
-            val reveal = rememberRevealState(index = 2)
-            LapRow(
-                lap = lap,
-                isFastest = viewModel.fastestLap?.index == lap.index,
-                isSlowest = viewModel.slowestLap?.index == lap.index,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .reveal(reveal),
-            )
         }
 
         item(key = "share") {
             val reveal = rememberRevealState(index = 3)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .reveal(reveal),
-                contentAlignment = Alignment.Center,
+            androidx.compose.animation.AnimatedVisibility(
+                visible = laps.isNotEmpty(),
+                enter = fadeIn(animationSpec = tween(ChronosMotion.Medium1)) +
+                    expandVertically(animationSpec = spring(dampingRatio = 0.85f, stiffness = 320f)),
+                exit = fadeOut(animationSpec = tween(ChronosMotion.Short3)) +
+                    shrinkVertically(animationSpec = spring(dampingRatio = 0.85f, stiffness = 380f)),
             ) {
-                ChronosTextButton(
-                    text = "Share Laps",
-                    leadingIcon = "share",
-                    onClick = {
-                        val share = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(
-                                android.content.Intent.EXTRA_TEXT,
-                                buildShareText(laps),
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                        .reveal(reveal),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    ChronosTextButton(
+                        text = "Share Laps",
+                        leadingIcon = "share",
+                        onClick = {
+                            val share = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(
+                                    android.content.Intent.EXTRA_TEXT,
+                                    buildShareText(laps),
+                                )
+                            }
+                            context.startActivity(
+                                android.content.Intent.createChooser(share, "Share laps"),
                             )
-                        }
-                        context.startActivity(
-                            android.content.Intent.createChooser(share, "Share laps"),
-                        )
-                    },
-                )
+                        },
+                    )
+                }
             }
         }
     }
@@ -194,6 +199,7 @@ private fun StopwatchGauge(
     elapsedMillis: Long,
     running: Boolean,
     lapCount: Int,
+    hasLaps: Boolean,
     onToggle: () -> Unit,
     onLap: () -> Unit,
     onReset: () -> Unit,
@@ -220,7 +226,11 @@ private fun StopwatchGauge(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = if (running) "STOPWATCH RUNNING" else "STOPWATCH STOPPED",
+                    text = when {
+                        running -> "STOPWATCH RUNNING"
+                        !hasLaps -> "STOPWATCH READY"
+                        else -> "STOPWATCH PAUSED"
+                    },
                     style = ChronosType.Eyebrow,
                     color = ChronosColors.Outline,
                     modifier = Modifier.padding(bottom = 4.dp),
@@ -240,11 +250,13 @@ private fun StopwatchGauge(
                         modifier = Modifier.padding(start = 2.dp, bottom = 8.dp),
                     )
                 }
-                Text(
-                    text = "Lap $lapCount",
-                    style = ChronosType.LabelMd,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
+                if (lapCount > 0) {
+                    Text(
+                        text = "Lap $lapCount",
+                        style = ChronosType.LabelMd,
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                }
             }
         }
 

@@ -11,4 +11,6 @@
     <string name="channel_alarms_desc">Alarms that are currently ringing</string>
     <string name="channel_timers">Timers</string>
     <string name="channel_timers_desc">Running countdown timers</string>
+    <string name="channel_timers_done">Finished timers</string>
+    <string name="channel_timers_done_desc">Tells you when a countdown timer reaches zero</string>
 </resources>
