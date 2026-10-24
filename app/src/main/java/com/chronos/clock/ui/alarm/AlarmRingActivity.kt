@@ -75,10 +75,13 @@ class AlarmRingActivity : ComponentActivity() {
         setContent {
             val repository = (application as ChronosApplication).repository
             val theme by repository.theme.collectAsStateWithLifecycle()
+            val use24Hour by repository.use24Hour.collectAsStateWithLifecycle()
 
             ChronosTheme(theme = theme) {
                 AlarmRingScreen(
-                    alarmTime = hour,
+                    alarmHour = hour,
+                    alarmMinute = minute,
+                    use24Hour = use24Hour,
                     alarmLabel = label.ifBlank { "Alarm" },
                     soundTitle = soundTitle,
                     snoozeEnabled = snoozeEnabled,
@@ -112,7 +115,9 @@ class AlarmRingActivity : ComponentActivity() {
 
 @Composable
 private fun AlarmRingScreen(
-    alarmTime: Int,
+    alarmHour: Int,
+    alarmMinute: Int,
+    use24Hour: Boolean,
     alarmLabel: String,
     soundTitle: String,
     snoozeEnabled: Boolean,
