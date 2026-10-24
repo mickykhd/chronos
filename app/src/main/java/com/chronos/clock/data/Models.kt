@@ -119,6 +119,29 @@ data class TimerPreset(
     val durationMillis: Long,
 )
 
+/** Conditions for a zone, cached so widgets can show it without a network call. */
+@Serializable
+data class WeatherSnapshot(
+    val temperatureCelsius: Int,
+    val condition: String,
+    val icon: String,
+)
+
+/**
+ * The stopwatch, expressed as timestamps so the time is reconstructable after a
+ * process death and can be read by the notification service.
+ */
+@Serializable
+data class StopwatchState(
+    val running: Boolean = false,
+    val runningSinceMillis: Long = 0L,
+    val accumulatedMillis: Long = 0L,
+) {
+    /** Elapsed time, recomputed from the clock when [now] differs. */
+    fun elapsed(now: Long): Long =
+        if (running) accumulatedMillis + (now - runningSinceMillis).coerceAtLeast(0L) else accumulatedMillis
+}
+
 /** One recorded lap. */
 @Serializable
 data class Lap(

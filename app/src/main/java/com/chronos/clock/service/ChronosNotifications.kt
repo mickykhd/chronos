@@ -6,11 +6,13 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import kotlin.math.roundToInt
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.chronos.clock.MainActivity
 import com.chronos.clock.R
 import com.chronos.clock.data.Alarm
+import com.chronos.clock.data.Lap
 import com.chronos.clock.data.RunningTimer
 
 /**
@@ -23,6 +25,7 @@ object ChronosNotifications {
     const val TIMER_DONE_CHANNEL = "chronos_timers_done"
 
     const val TIMER_NOTIFICATION_ID = 4201
+    const val STOPWATCH_NOTIFICATION_ID = 4203
     const val ALARM_NOTIFICATION_ID = 4202
 
     /**
@@ -90,20 +93,52 @@ object ChronosNotifications {
         timer: RunningTimer,
         ongoing: Boolean,
     ): Notification {
-        val title = if (ongoing) "${timer.label} · ${timer.remainingText()}" else "${timer.label} finished"
-        val text = if (ongoing) "Time remaining" else "Your ${timer.label} timer has finished"
+        val title = "${timer.label} · ${timer.remainingText()}"
+        val percent = (timer.progress * 100).roundToInt()
 
-        return NotificationCompat.Builder(context, TIMER_CHANNEL)
+        // On Android 16 this is a rich ongoing with a live progress bar -- the
+        // official API behind the system's live/ongoing surfaces (Pixel's Dynamic
+        // Island and the vendor equivalents). Below that it is the same
+        // information with a classic progress bar.
+        val builder = NotificationCompat.Builder(context, TIMER_CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
-            .setContentText(text)
+            .setContentText("Time remaining · $percent%")
             .setContentIntent(openAppIntent(context, timer.id.hashCode()))
             .setOngoing(ongoing)
             .setSilent(ongoing)
             .setShowWhen(false)
-            .setCategory(if (ongoing) Notification.CATEGORY_PROGRESS else Notification.CATEGORY_ALARM)
+            .setCategory(Notification.CATEGORY_ALARM)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+
+        builder.setProgress(100, percent, false)
+
+        return builder
             .setPriority(if (ongoing) NotificationCompat.PRIORITY_LOW else NotificationCompat.PRIORITY_HIGH)
             .build()
+    }
+
+    /**
+     * A running stopwatch, kept current by [StopwatchService].
+     */
+    fun stopwatchNotification(
+        context: Context,
+        elapsedMillis: Long,
+        lapCount: Int,
+    ): Notification {
+        val builder = NotificationCompat.Builder(context, TIMER_CHANNEL)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Stopwatch · ${Lap.formatSplit(elapsedMillis)}")
+            .setContentText(if (lapCount > 0) "$lapCount lap" else "Running")
+            .setContentIntent(openAppIntent(context, 0))
+            .setOngoing(true)
+            .setSilent(true)
+            .setShowWhen(false)
+            .setCategory(Notification.CATEGORY_STOPWATCH)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+
+        return builder.build()
     }
 
     fun showTimerFinished(context: Context, timer: RunningTimer) {

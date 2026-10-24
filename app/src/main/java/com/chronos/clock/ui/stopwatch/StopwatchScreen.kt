@@ -104,7 +104,7 @@ fun StopwatchScreen(
             val reveal = rememberRevealState(index = 0)
             StopwatchGauge(
                 elapsedMillis = viewModel.elapsedMillis,
-                running = viewModel.running,
+                running = viewModel.stopwatch.value.running,
                 lapCount = laps.size,
                 hasLaps = laps.isNotEmpty(),
                 onToggle = viewModel::toggle,

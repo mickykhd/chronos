@@ -17,6 +17,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Needed to open the alarm tone the user picks from the device's sounds. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
     <application
         android:name=".ChronosApplication"
         android:allowBackup="true"
@@ -61,6 +64,46 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Ongoing countdown timer shown to the user while a timer runs." />
         </service>
+
+        <!-- Keeps the running stopwatch in the notification area. -->
+        <service
+            android:name=".service.StopwatchService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Ongoing running stopwatch shown to the user while they keep time." />
+        </service>
+
+        <!-- Fires every minute to keep the home-screen widgets current. -->
+        <receiver
+            android:name=".widget.ChronosWidgetTickReceiver"
+            android:exported="false" />
+
+        <!-- Home-screen widgets -->
+        <receiver
+            android:name=".widget.ChronosClockWidgetProvider"
+            android:exported="false"
+            android:label="Chronos clock">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/clock_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.ChronosAnalogWidgetProvider"
+            android:exported="false"
+            android:label="Chronos analog">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/analog_widget_info" />
+        </receiver>
 
         <!-- Plays the alarm when it fires. -->
         <service

@@ -40,6 +40,9 @@ class ChronosRepository(context: Context) {
     private val _customPresets = MutableStateFlow(read("presets", emptyList<TimerPreset>()))
     val customPresets: StateFlow<List<TimerPreset>> = _customPresets.asStateFlow()
 
+    private val _stopwatch = MutableStateFlow(read("stopwatch", StopwatchState()))
+    val stopwatch: StateFlow<StopwatchState> = _stopwatch.asStateFlow()
+
     private val _laps = MutableStateFlow(read("laps", emptyList<Lap>()))
     val laps: StateFlow<List<Lap>> = _laps.asStateFlow()
 
@@ -52,6 +55,8 @@ class ChronosRepository(context: Context) {
     val theme: StateFlow<ChronosTheme> = _theme.asStateFlow()
 
     private val _use24Hour = MutableStateFlow(read("use24h", false))
+
+    private val _weatherCache = MutableStateFlow(read("weather", emptyMap<String, WeatherSnapshot>()) as Map<String, WeatherSnapshot>)
     val use24Hour: StateFlow<Boolean> = _use24Hour.asStateFlow()
 
     // ---------------------------------------------------------------- alarms
@@ -145,6 +150,11 @@ class ChronosRepository(context: Context) {
 
     // --------------------------------------------------------------- laps
 
+    fun updateStopwatch(state: StopwatchState) {
+        _stopwatch.value = state
+        persist("stopwatch", state)
+    }
+
     fun addLap(lap: Lap) {
         _laps.value = _laps.value + lap
         persist("laps", _laps.value)
@@ -161,6 +171,19 @@ class ChronosRepository(context: Context) {
         _sleepSchedule.value = schedule
         persist("sleep", _sleepSchedule.value)
     }
+
+    // ------------------------------------------------------------ weather
+
+    /**
+     * Last conditions seen for each zone, so the home-screen widgets can show
+     * weather without a network round trip on every refresh.
+     */
+    fun recordWeather(zoneId: String, snapshot: WeatherSnapshot) {
+        _weatherCache.value = _weatherCache.value + (zoneId to snapshot)
+        persist("weather", _weatherCache.value)
+    }
+
+    fun cachedWeather(zoneId: String): WeatherSnapshot? = _weatherCache.value[zoneId]
 
     // ------------------------------------------------------------ settings
 

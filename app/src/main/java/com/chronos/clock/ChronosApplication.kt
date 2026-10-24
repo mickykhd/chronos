@@ -13,5 +13,6 @@ class ChronosApplication : Application() {
         super.onCreate()
         repository = ChronosRepository(this)
         ChronosNotifications.ensureChannels(this)
+        com.chronos.clock.widget.scheduleWidgetTick(this)
     }
 }

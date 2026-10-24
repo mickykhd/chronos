@@ -505,6 +505,27 @@ private fun SoundPickerSheet(
     val context = androidx.compose.ui.platform.LocalContext.current
     var sounds by remember { mutableStateOf(emptyList<AlarmSounds.Sound>()) }
 
+    // A sound plays for a few seconds as you pick it: blind-selecting a title from
+    // a list is not how anyone chooses a tone.
+    val preview = remember(context) { com.chronos.clock.service.RingtonePlayer(context) }
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        onDispose { preview.stop() }
+    }
+
+    // Which sound is previewing right now, so the row can show a stop button.
+    var playingUri by remember { mutableStateOf<String?>(null) }
+    fun previewToggle(sound: AlarmSounds.Sound?) {
+        if (playingUri == sound?.uri) {
+            preview.stop()
+            playingUri = null
+            return
+        }
+        val uri = sound?.uri
+            ?: AlarmSounds.defaultAlarmSound(context)?.uri
+            ?: return
+        if (preview.play(android.net.Uri.parse(uri))) playingUri = sound?.uri
+    }
+
     androidx.compose.runtime.LaunchedEffect(context) {
         sounds = AlarmSounds.load(context)
     }
@@ -523,7 +544,7 @@ private fun SoundPickerSheet(
                 modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 4.dp),
             )
             Text(
-                text = "Sounds installed on this device",
+                text = "Sounds installed on this device — tap to preview",
                 style = ChronosType.BodyMd,
                 color = ChronosColors.Outline,
                 modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
@@ -531,15 +552,19 @@ private fun SoundPickerSheet(
 
             // The list is scrollable: a phone can have dozens of installed sounds.
             LazyColumn(modifier = Modifier.heightIn(max = 420.dp)) {
-                item {
+                item(key = "default") {
+                    val default = AlarmSounds.defaultAlarmSound(context)
                     SoundRow(
                         title = "Default",
                         selected = selectedUri == null,
-                        onClick = { onSelect(null) },
+                        playing = playingUri == "default",
+                        onSelect = { onSelect(null) },
+                        onPreview = { playingUri = if (playingUri == "default") null else "default" }
+                            .also { if (playingUri == "default") preview.stop() else preview.play(default?.uri?.let { android.net.Uri.parse(it) }) },
                     )
                 }
                 sounds.groupBy { it.kind }.forEach { (kind, group) ->
-                    item {
+                    item(key = "kind-${kind.name}") {
                         Text(
                             text = kind.label.uppercase(Locale.US),
                             style = ChronosType.Eyebrow,
@@ -557,7 +582,16 @@ private fun SoundPickerSheet(
                         SoundRow(
                             title = sound.title,
                             selected = sound.uri == selectedUri,
-                            onClick = { onSelect(sound) },
+                            playing = playingUri == sound.uri,
+                            onSelect = { onSelect(sound) },
+                            onPreview = {
+                                if (playingUri == sound.uri) {
+                                    preview.stop()
+                                    playingUri = null
+                                } else if (preview.play(android.net.Uri.parse(sound.uri))) {
+                                    playingUri = sound.uri
+                                }
+                            },
                         )
                     }
                 }
@@ -572,12 +606,14 @@ private fun SoundPickerSheet(
 private fun SoundRow(
     title: String,
     selected: Boolean,
-    onClick: () -> Unit,
+    playing: Boolean = false,
+    onSelect: () -> Unit,
+    onPreview: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(onClick = onSelect)
             .padding(horizontal = 24.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -588,6 +624,22 @@ private fun SoundRow(
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
             modifier = Modifier.weight(1f),
         )
+        // Preview: hear the tone before committing to it.
+        ChronosIcon(
+            name = if (playing) "pause" else "play_arrow",
+            size = 20.dp,
+            tint = MaterialTheme.colorScheme.primaryContainer,
+            filled = playing,
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable(
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    indication = null,
+                    onClick = onPreview,
+                )
+                .padding(6.dp),
+        )
+        Spacer(Modifier.width(12.dp))
         if (selected) {
             ChronosIcon(
                 name = "check",
@@ -630,7 +682,7 @@ private fun VibrationPickerSheet(
                 SoundRow(
                     title = pattern.label,
                     selected = pattern == selected,
-                    onClick = { onSelect(pattern) },
+                    onSelect = { onSelect(pattern) },
                 )
             }
             Spacer(Modifier.height(16.dp))

@@ -23,8 +23,7 @@ object ChronosViewModelFactory {
             TimerViewModel(this[APPLICATION_KEY] as ChronosApplication)
         }
         initializer {
-            val app = this[APPLICATION_KEY] as ChronosApplication
-            StopwatchViewModel(app.repository)
+            StopwatchViewModel(this[APPLICATION_KEY] as ChronosApplication)
         }
     }
 }

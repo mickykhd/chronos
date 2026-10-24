@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_analog_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="10dp"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/widget_analog_dial"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:scaleType="fitCenter"
+        android:contentDescription="Analog clock" />
+
+    <TextView
+        android:id="@+id/widget_analog_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="10sp"
+        android:letterSpacing="0.06"
+        android:textAllCaps="true"
+        android:textColor="#9F8D82"
+        android:text="Saturday" />
+</LinearLayout>

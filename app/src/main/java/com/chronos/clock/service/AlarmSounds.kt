@@ -1,26 +1,32 @@
 package com.chronos.clock.service
 
 import android.content.Context
+import android.database.Cursor
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.Ringtone
 import android.media.RingtoneManager
-import android.content.ContentUris
 import android.net.Uri
-import android.provider.MediaStore
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import com.chronos.clock.R
 import com.chronos.clock.data.VibrationPattern
+import kotlin.math.abs
 
 /**
  * The alarm, ringtone and notification sounds installed on the device.
  *
- * A fresh install has whatever the phone already ships with — the app never bundles
- * or assumes a particular tone.
+ * The list comes from [RingtoneManager]'s own cursor rather than a media-store
+ * query: that cursor is what the system Sounds settings shows, so it includes every
+ * tone the device vendor ships (including OEM tone packs) — those are frequently
+ * not tagged with the media-store ringtone/alarm flags and are invisible to a
+ * media query.
+ *
+ * A fresh install has whatever the phone already ships with; the app bundles
+ * nothing and assumes nothing.
  */
 object AlarmSounds {
 
@@ -48,62 +54,43 @@ object AlarmSounds {
         )
     }
 
-    /**
-     * Every sound the user can pick, read from the device's media store.
-     *
-     * A sound is an alarm, ringtone or notification when the system has flagged it
-     * as one; anything else is ignored.
-     */
+    /** Every sound the user can pick, grouped by kind. */
     fun load(context: Context): List<Sound> {
         val result = mutableListOf<Sound>()
-
-        val projection = arrayOf(
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.IS_ALARM,
-            MediaStore.Audio.Media.IS_RINGTONE,
-            MediaStore.Audio.Media.IS_NOTIFICATION,
-        )
-
-        runCatching {
-            context.contentResolver.query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                null,
-                null,
-                null,
-            )?.use { cursor ->
-                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-                val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-                val alarmColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.IS_ALARM)
-                val ringtoneColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.IS_RINGTONE)
-                val notificationColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.IS_NOTIFICATION)
-
-                while (cursor.moveToNext()) {
-                    val id = cursor.getLong(idColumn)
-                    val title = cursor.getString(titleColumn) ?: continue
-                    val kind = when {
-                        cursor.getInt(alarmColumn) != 0 -> Kind.Alarm
-                        cursor.getInt(ringtoneColumn) != 0 -> Kind.Ringtone
-                        cursor.getInt(notificationColumn) != 0 -> Kind.Notification
-                        else -> null
-                    } ?: continue
-
-                    val uri = ContentUris.withAppendedId(
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        id,
-                    )
-                    result += Sound(uri.toString(), title, kind)
-                }
+        Kind.entries.forEach { kind ->
+            val type = when (kind) {
+                Kind.Alarm -> RingtoneManager.TYPE_ALARM
+                Kind.Ringtone -> RingtoneManager.TYPE_RINGTONE
+                Kind.Notification -> RingtoneManager.TYPE_NOTIFICATION
             }
+            result += collectType(context, type, kind)
         }
 
-        // Some devices expose an alarm slot but no list; fall back to the default.
+        // Some devices expose an alarm slot but list nothing under it; fall back to
+        // the default so there is always something selectable.
         if (result.none { it.kind == Kind.Alarm }) {
             defaultAlarmSound(context)?.let { result.add(0, it) }
         }
-        return result.distinctBy { it.uri }
+        return result
+    }
+
+    private fun collectType(context: Context, type: Int, kind: Kind): List<Sound> {
+        val sounds = mutableListOf<Sound>()
+        runCatching {
+            val manager = RingtoneManager(context).apply { setType(type) }
+            val cursor: Cursor = manager.cursor
+            cursor.use {
+                while (it.moveToNext()) {
+                    val uri = runCatching { manager.getRingtoneUri(it.position) }.getOrNull()
+                        ?: continue
+                    val title = it.getString(RingtoneManager.TITLE_COLUMN_INDEX)
+                        ?: titleFor(context, uri)
+                        ?: continue
+                    sounds += Sound(uri.toString(), title, kind)
+                }
+            }
+        }
+        return sounds
     }
 
     private fun titleFor(context: Context, uri: Uri): String? = runCatching {
@@ -222,12 +209,7 @@ class RingtonePlayer(context: Context) {
         }
         val request = android.media.AudioFocusRequest
             .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build(),
-            )
+            .setAudioAttributes(alarmAttributes())
             .setOnAudioFocusChangeListener { }
             .build()
         focusRequest = request

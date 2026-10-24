@@ -30,6 +30,17 @@ object Weather {
         /** The hero card uses the imperial scale, matching the design. */
         val temperatureFahrenheit: Int
             get() = Math.round(temperatureCelsius * 9f / 5f + 32f)
+
+        /**
+         * A serialisable copy, so the home-screen widgets can show conditions
+         * without fetching them again.
+         */
+        fun snapshot(): com.chronos.clock.data.WeatherSnapshot =
+            com.chronos.clock.data.WeatherSnapshot(
+                temperatureCelsius = temperatureCelsius,
+                condition = condition,
+                icon = icon,
+            )
     }
 
     private val cache = ConcurrentHashMap<String, Pair<Long, Current>>()

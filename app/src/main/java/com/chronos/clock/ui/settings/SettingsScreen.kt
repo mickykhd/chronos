@@ -19,11 +19,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.asImageBitmap
+import com.chronos.clock.ui.theme.ChronosType
+import com.chronos.clock.core.rememberNow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,13 +37,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.chronos.clock.BuildConfig
 import com.chronos.clock.ui.components.ChronosIcon
 import com.chronos.clock.ui.components.ChronosIconButton
 import com.chronos.clock.ui.components.M3Switch
 import com.chronos.clock.ui.theme.ChronosColors
 import com.chronos.clock.ui.theme.ChronosRadius
 import com.chronos.clock.ui.theme.ChronosTheme
-import com.chronos.clock.ui.theme.ChronosType
 
 /**
  * App settings: the colour theme, the clock format and a little about the app.
@@ -119,8 +124,22 @@ fun SettingsScreen(
                 }
             }
 
+            SettingsGroup(title = "Widgets") {
+                Text(
+                    text = "Add a clock to your home screen: long-press an empty spot, " +
+                        "tap Widgets, then find Chronos.",
+                    style = ChronosType.BodyMd,
+                    color = ChronosColors.Outline,
+                    modifier = Modifier.padding(vertical = 10.dp),
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    AnalogWidgetPreview(modifier = Modifier.size(96.dp))
+                    DigitalWidgetPreview(modifier = Modifier.weight(1f))
+                }
+            }
+
             SettingsGroup(title = "About") {
-                AboutRow("Chronos", "Version 1.1.0")
+                AboutRow("Chronos", "Version " + BuildConfig.VERSION_NAME)
                 AboutRow("Design system", "Chronos M3")
                 AboutRow("Weather", "Open-Meteo")
                 AboutRow("Licence", "MIT")
@@ -224,6 +243,66 @@ private fun Swatch(color: Color, size: androidx.compose.ui.unit.Dp, offset: andr
             .background(color)
             .border(1.dp, ChronosColors.GhostBorder, CircleShape),
     )
+}
+
+@Composable
+private fun AnalogWidgetPreview(modifier: Modifier = Modifier) {
+    val zone = java.time.ZoneId.systemDefault()
+    val now = java.time.LocalDateTime.now(zone)
+    val seconds = ((System.currentTimeMillis() % 60_000L) / 1000L).toInt()
+    val dial = remember(now.hour, now.minute, seconds) {
+        val bitmap = com.chronos.clock.widget.drawWidgetDial(256, now.hour, now.minute, seconds)
+        bitmap.asImageBitmap()
+    }
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(ChronosColors.SurfaceContainerLow),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            bitmap = dial,
+            contentDescription = "Analog widget preview",
+            modifier = Modifier.fillMaxSize(),
+        )
+    }
+}
+
+@Composable
+private fun DigitalWidgetPreview(modifier: Modifier = Modifier) {
+    val zone = java.time.ZoneId.systemDefault()
+    val now by rememberNow()
+    val text = now.format(java.time.format.DateTimeFormatter.ofPattern("h:mm"))
+    Box(
+        modifier = modifier
+            .height(64.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(ChronosColors.SurfaceContainerLow)
+            .padding(horizontal = 14.dp),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = text,
+                style = com.chronos.clock.ui.theme.ChronosType.HeadlineLgMobile,
+                color = ChronosColors.OnSurface,
+                modifier = Modifier.alignByBaseline(),
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = if (now.hour < 12) "AM" else "PM",
+                style = ChronosType.LabelMd,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(ChronosRadius.Pill))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(horizontal = 6.dp, vertical = 1.dp)
+                    .padding(bottom = 8.dp)
+                    .alignByBaseline(),
+            )
+        }
+    }
 }
 
 @Composable
