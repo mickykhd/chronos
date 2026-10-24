@@ -137,8 +137,12 @@ cp keystore.properties.example keystore.properties
 ./gradlew :app:assembleRelease
 ```
 
-`keystore.properties` and `keystore/` are git-ignored. The APK attached to the
-GitHub release is signed with a locally generated key.
+`keystore.properties` and `keystore/` are git-ignored.
+
+The APK attached to the GitHub release is signed with a release key generated
+locally. The key lives in `keystore/chronos-release.jks` and the credentials in
+`keystore.properties`, both on this machine only — **back them up**, because a
+published Android app can only be updated with the same key.
 
 ---
 
