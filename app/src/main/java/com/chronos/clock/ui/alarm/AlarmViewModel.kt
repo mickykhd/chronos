@@ -16,6 +16,7 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
 
     val alarms = repository.alarms
     val sleepSchedule = repository.sleepSchedule
+    val use24Hour = repository.use24Hour
 
     fun toggle(id: String, enabled: Boolean) {
         repository.toggleAlarm(id, enabled)

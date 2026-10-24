@@ -11,6 +11,10 @@ Android 8.0 (API 26) and newer.
 |---|---|---|---|
 | ![Alarm](docs/screenshots/alarm.png) | ![Clock](docs/screenshots/clock.png) | ![Timer](docs/screenshots/timer.png) | ![Stopwatch](docs/screenshots/stopwatch.png) |
 
+| Ringing | Settings | World clock list |
+|---|---|---|
+| ![Ringing](docs/screenshots/alarm-ringing.png) | ![Settings](docs/screenshots/settings.png) | ![World clock](docs/screenshots/world-clock-list.png) |
+
 📦 [Download the APK from the Releases page](https://github.com/mickykhd/chronos/releases)
 
 ---

@@ -20,8 +20,12 @@ class AlarmReceiver : BroadcastReceiver() {
 
         if (alarm != null) {
             AlarmService.start(context, alarm)
-            // Book the next occurrence so repeating alarms keep going.
-            if (alarm.enabled) {
+            if (alarm.days.isEmpty()) {
+                // A one-time alarm fires once and then switches itself off.
+                app?.repository?.updateAlarm(alarm.copy(enabled = false))
+                AlarmScheduler.cancel(context, alarm)
+            } else if (alarm.enabled) {
+                // Book the next occurrence so repeating alarms keep going.
                 AlarmScheduler.schedule(context, alarm)
             }
         } else {

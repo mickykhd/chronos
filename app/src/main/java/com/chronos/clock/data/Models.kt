@@ -55,22 +55,23 @@ data class Alarm(
         else -> dayOfWeeks.joinToString(", ") { it.getDisplayName(TextStyle.SHORT, Locale.US) }
     }
 
-    /** `07:00` */
-    fun timeText(): String = "%02d:%02d".format(hour, minute)
+    /** The digits to show, in the format the user has chosen. */
+    fun timeDigits(use24Hour: Boolean): String =
+        if (use24Hour) "%02d:%02d".format(hour, minute) else hour12(hour).toString() + ":%02d".format(minute)
 
+    /** Only present in twelve-hour format. */
     fun meridiem(): String = if (hour < 12) "AM" else "PM"
 
-    /** `7:00 AM` — the twelve-hour form used in the alarm banner. */
-    fun timeText12(): String {
-        val h = when (hour % 12) {
-            0 -> 12
-            else -> hour % 12
-        }
-        return "$h:%02d ${meridiem()}".format(minute)
+    private fun hour12(hour: Int): Int {
+        val mod = hour % 12
+        return if (mod == 0) 12 else mod
     }
 
-    /** `07:00` in 24-hour form, for the 24-hour clock setting. */
-    fun timeText24(): String = "%02d:%02d".format(hour, minute)
+    /** `7:00 PM` — single line, used on the ringing notification. */
+    fun timeText12(): String {
+        val h = hour12(hour)
+        return "$h:%02d ${meridiem()}".format(minute)
+    }
 
     /** The date this alarm next fires, relative to [now]. */
     fun nextTrigger(now: java.time.LocalDateTime): java.time.LocalDateTime =

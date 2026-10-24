@@ -82,6 +82,7 @@ fun AlarmScreen(
 ) {
     val alarms by viewModel.alarms.collectAsStateWithLifecycle()
     val sleepSchedule by viewModel.sleepSchedule.collectAsStateWithLifecycle()
+    val use24Hour by viewModel.use24Hour.collectAsStateWithLifecycle()
     val now by rememberNow()
     var overflowOpen by remember { mutableStateOf(false) }
 
@@ -152,6 +153,7 @@ fun AlarmScreen(
                 AlarmCard(
                     alarm = alarm,
                     now = now,
+                    use24Hour = use24Hour,
                     onToggle = { enabled -> viewModel.toggle(alarm.id, enabled) },
                     onToggleDay = { day -> viewModel.toggleDay(alarm.id, day) },
                     onClick = { onEditAlarm(alarm.id) },
@@ -310,6 +312,7 @@ private fun UpcomingAlarmBanner(
 private fun AlarmCard(
     alarm: Alarm,
     now: ZonedDateTime,
+    use24Hour: Boolean,
     onToggle: (Boolean) -> Unit,
     onToggleDay: (Int) -> Unit,
     onClick: () -> Unit,
@@ -353,20 +356,22 @@ private fun AlarmCard(
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
-                        text = alarm.timeText(),
+                        text = alarm.timeDigits(use24Hour),
                         style = ChronosType.HeadlineLgMobile,
                         color = timeColor,
                         fontWeight = if (alarm.enabled) FontWeight.Medium else FontWeight.Light,
                         modifier = Modifier.alignByBaseline(),
                     )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = alarm.meridiem(),
-                        style = ChronosType.TitleMd,
-                        color = meridiemColor,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.alignByBaseline(),
-                    )
+                    if (!use24Hour) {
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = alarm.meridiem(),
+                            style = ChronosType.TitleMd,
+                            color = meridiemColor,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.alignByBaseline(),
+                        )
+                    }
                 }
                 Row(
                     modifier = Modifier.padding(top = 2.dp),
