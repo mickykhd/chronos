@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -87,7 +88,7 @@ fun ChronosBottomBar(
                 .size(ChronosDimens.NavPillWidth, ChronosDimens.NavPillHeight)
                 .scale(1f, pillAlpha)
                 .clip(RoundedCornerShape(ChronosDimens.NavPillHeight / 2))
-                .background(ChronosColors.SecondaryContainer),
+                .background(MaterialTheme.colorScheme.secondaryContainer),
         )
 
         Row(
@@ -126,12 +127,12 @@ private fun ChronosNavItem(
     val interaction: MutableInteractionSource = press.interaction
 
     val iconColor by animateColorAsState(
-        targetValue = if (selected) ChronosColors.PrimaryContainer else ChronosColors.Outline,
+        targetValue = if (selected) MaterialTheme.colorScheme.primaryContainer else ChronosColors.Outline,
         animationSpec = spring(dampingRatio = 0.7f, stiffness = 500f),
         label = "navIconColor",
     )
     val labelColor by animateColorAsState(
-        targetValue = if (selected) ChronosColors.PrimaryContainer else ChronosColors.Outline,
+        targetValue = if (selected) MaterialTheme.colorScheme.primaryContainer else ChronosColors.Outline,
         animationSpec = spring(dampingRatio = 0.7f, stiffness = 500f),
         label = "navLabelColor",
     )

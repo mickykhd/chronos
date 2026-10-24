@@ -24,8 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -47,6 +47,7 @@ import com.chronos.clock.data.ChronosRepository
 import com.chronos.clock.data.WorldCity
 import com.chronos.clock.ui.ChronosDestination
 import com.chronos.clock.ui.ChronosViewModelFactory
+import com.chronos.clock.ui.alarm.AlarmEditScreen
 import com.chronos.clock.ui.alarm.AlarmScreen
 import com.chronos.clock.ui.alarm.AlarmViewModel
 import com.chronos.clock.ui.clock.ClockScreen
@@ -54,36 +55,145 @@ import com.chronos.clock.ui.clock.ClockViewModel
 import com.chronos.clock.ui.components.ChronosBottomBar
 import com.chronos.clock.ui.components.ChronosIcon
 import com.chronos.clock.ui.components.ChronosTextButton
-import com.chronos.clock.ui.theme.ChronosColors
-import com.chronos.clock.ui.theme.ChronosMotion
-import com.chronos.clock.ui.theme.ChronosRadius
-import com.chronos.clock.ui.theme.ChronosType
+import com.chronos.clock.ui.settings.SettingsScreen
 import com.chronos.clock.ui.stopwatch.StopwatchScreen
 import com.chronos.clock.ui.stopwatch.StopwatchViewModel
+import com.chronos.clock.ui.theme.ChronosColors
+import com.chronos.clock.ui.theme.ChronosMotion
+import com.chronos.clock.ui.theme.ChronosType
 import com.chronos.clock.ui.timer.TimerScreen
 import com.chronos.clock.ui.timer.TimerViewModel
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+/**
+ * The screens Chronos can show. Tabs sit at the root; settings and the alarm editor
+ * are pushed on top of them.
+ */
+private sealed interface ChronosScreen {
+    data object Tabs : ChronosScreen
+    data object Settings : ChronosScreen
+    data class EditAlarm(val alarmId: String?) : ChronosScreen
+}
+
 @Composable
 fun ChronosApp() {
-    var destination by rememberSaveable { mutableStateOf(ChronosDestination.Alarm) }
-
     val clockViewModel: ClockViewModel = viewModel(factory = ChronosViewModelFactory.Factory)
     val alarmViewModel: AlarmViewModel = viewModel(factory = ChronosViewModelFactory.Factory)
     val timerViewModel: TimerViewModel = viewModel(factory = ChronosViewModelFactory.Factory)
     val stopwatchViewModel: StopwatchViewModel = viewModel(factory = ChronosViewModelFactory.Factory)
 
-    val pinnedCities by clockViewModel.cities.collectAsStateWithLifecycle()
-
+    var destination by rememberSaveable { mutableStateOf(ChronosDestination.Alarm) }
+    var screen by remember { mutableStateOf<ChronosScreen>(ChronosScreen.Tabs) }
     var showCitySheet by rememberSaveable { mutableStateOf(false) }
     var showCompareSheet by rememberSaveable { mutableStateOf(false) }
+
+    val pinnedCities by clockViewModel.cities.collectAsStateWithLifecycle()
+    val alarms by alarmViewModel.alarms.collectAsStateWithLifecycle()
+    val theme by clockViewModel.theme.collectAsStateWithLifecycle()
+    val use24Hour by clockViewModel.use24Hour.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(ChronosColors.Surface),
     ) {
+        AnimatedContent(
+            targetState = screen,
+            transitionSpec = {
+                val isPush = targetState !is ChronosScreen.Tabs
+                val enter = slideInHorizontally(
+                    animationSpec = tween(ChronosMotion.Medium2, easing = ChronosMotion.EmphasizedDecelerate),
+                ) { width -> if (isPush) width / 3 else 0 } +
+                    fadeIn(animationSpec = tween(ChronosMotion.Medium1))
+                val exit = slideOutHorizontally(
+                    animationSpec = tween(ChronosMotion.Medium2, easing = ChronosMotion.EmphasizedAccelerate),
+                ) { width -> if (isPush) -width / 8 else -width / 3 } +
+                    fadeOut(animationSpec = tween(ChronosMotion.Short3))
+                enter togetherWith exit
+            },
+            label = "appScreen",
+        ) { current ->
+            when (current) {
+                is ChronosScreen.Tabs -> TabsContent(
+                    destination = destination,
+                    onDestinationChange = { destination = it },
+                    clockViewModel = clockViewModel,
+                    alarmViewModel = alarmViewModel,
+                    timerViewModel = timerViewModel,
+                    stopwatchViewModel = stopwatchViewModel,
+                    onOpenSettings = { screen = ChronosScreen.Settings },
+                    onEditAlarm = { id -> screen = ChronosScreen.EditAlarm(id) },
+                    onAddCity = { showCitySheet = true },
+                    onCompareTimes = { showCompareSheet = true },
+                )
+
+                is ChronosScreen.Settings -> SettingsScreen(
+                    theme = theme,
+                    use24Hour = use24Hour,
+                    onThemeChange = clockViewModel::setTheme,
+                    onUse24HourChange = clockViewModel::setUse24Hour,
+                    onClose = { screen = ChronosScreen.Tabs },
+                )
+
+                is ChronosScreen.EditAlarm -> {
+                    val existing = alarms.firstOrNull { it.id == current.alarmId }
+                    AlarmEditScreen(
+                        existing = existing,
+                        use24Hour = use24Hour,
+                        onSave = { alarm ->
+                            if (existing == null) {
+                                alarmViewModel.addAlarm(alarm)
+                            } else {
+                                alarmViewModel.updateAlarm(alarm)
+                            }
+                            screen = ChronosScreen.Tabs
+                        },
+                        onDelete = existing?.let {
+                            {
+                                alarmViewModel.removeAlarm(it.id)
+                                screen = ChronosScreen.Tabs
+                            }
+                        },
+                        onClose = { screen = ChronosScreen.Tabs },
+                    )
+                }
+            }
+        }
+    }
+
+    if (showCitySheet) {
+        AddCitySheet(
+            onDismiss = { showCitySheet = false },
+            onPick = { city ->
+                clockViewModel.addCity(city)
+                showCitySheet = false
+            },
+        )
+    }
+
+    if (showCompareSheet) {
+        CompareTimesSheet(
+            cities = pinnedCities,
+            onDismiss = { showCompareSheet = false },
+        )
+    }
+}
+
+@Composable
+private fun TabsContent(
+    destination: ChronosDestination,
+    onDestinationChange: (ChronosDestination) -> Unit,
+    clockViewModel: ClockViewModel,
+    alarmViewModel: AlarmViewModel,
+    timerViewModel: TimerViewModel,
+    stopwatchViewModel: StopwatchViewModel,
+    onOpenSettings: () -> Unit,
+    onEditAlarm: (String?) -> Unit,
+    onAddCity: () -> Unit,
+    onCompareTimes: () -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
         AnimatedContent(
             targetState = destination,
             transitionSpec = {
@@ -110,40 +220,35 @@ fun ChronosApp() {
             label = "destinationContent",
         ) { current ->
             when (current) {
-                ChronosDestination.Alarm -> AlarmScreen(viewModel = alarmViewModel)
+                ChronosDestination.Alarm -> AlarmScreen(
+                    viewModel = alarmViewModel,
+                    onAddAlarm = { onEditAlarm(null) },
+                    onEditAlarm = { onEditAlarm(it) },
+                    onOpenSettings = onOpenSettings,
+                )
                 ChronosDestination.Clock -> ClockScreen(
                     viewModel = clockViewModel,
-                    onAddCity = { showCitySheet = true },
-                    onCompareTimes = { showCompareSheet = true },
+                    onAddCity = onAddCity,
+                    onCompareTimes = onCompareTimes,
+                    onOpenSettings = onOpenSettings,
                 )
-                ChronosDestination.Timer -> TimerScreen(viewModel = timerViewModel)
-                ChronosDestination.Stopwatch -> StopwatchScreen(viewModel = stopwatchViewModel)
+                ChronosDestination.Timer -> TimerScreen(
+                    viewModel = timerViewModel,
+                    onOpenSettings = onOpenSettings,
+                )
+                ChronosDestination.Stopwatch -> StopwatchScreen(
+                    viewModel = stopwatchViewModel,
+                    onOpenSettings = onOpenSettings,
+                )
             }
         }
 
         ChronosBottomBar(
             selected = destination,
             onSelect = { target ->
-                if (target != destination) destination = target
+                if (target != destination) onDestinationChange(target)
             },
             modifier = Modifier.align(Alignment.BottomCenter),
-        )
-    }
-
-    if (showCitySheet) {
-        AddCitySheet(
-            onDismiss = { showCitySheet = false },
-            onPick = { city ->
-                clockViewModel.addCity(city)
-                showCitySheet = false
-            },
-        )
-    }
-
-    if (showCompareSheet) {
-        CompareTimesSheet(
-            cities = pinnedCities,
-            onDismiss = { showCompareSheet = false },
         )
     }
 }
@@ -187,13 +292,13 @@ private fun AddCitySheet(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(CircleShape)
-                                .background(ChronosColors.SecondaryContainer),
+                                .background(MaterialTheme.colorScheme.secondaryContainer),
                             contentAlignment = Alignment.Center,
                         ) {
                             ChronosIcon(
                                 name = "public",
                                 size = 20.dp,
-                                tint = ChronosColors.Primary,
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                         Spacer(Modifier.width(12.dp))
@@ -213,7 +318,7 @@ private fun AddCitySheet(
                             text = "Add",
                             onClick = { onPick(city) },
                             container = ChronosColors.SurfaceContainer,
-                            contentColor = ChronosColors.Primary,
+                            contentColor = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -285,7 +390,7 @@ private fun CompareTimesSheet(
                         Text(
                             text = cityTime.format(format),
                             style = ChronosType.TitleMd,
-                            color = ChronosColors.PrimaryContainer,
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             fontWeight = FontWeight.Medium,
                         )
                     }

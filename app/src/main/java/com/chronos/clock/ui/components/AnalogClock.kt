@@ -23,6 +23,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.math.cos
 import kotlin.math.sin
+import androidx.compose.material3.MaterialTheme
 
 /**
  * The live Material 3 Expressive analog clock widget.
@@ -46,6 +47,14 @@ fun AnalogClock(
             }
         }
     }
+
+    // Theme colours have to be read outside the draw scope.
+    val hourHandColor = MaterialTheme.colorScheme.primary
+    val minuteHandColor = MaterialTheme.colorScheme.primaryContainer
+    val secondHandColor = MaterialTheme.colorScheme.tertiary
+    val pivotColor = MaterialTheme.colorScheme.onPrimary
+    val pivotRingColor = MaterialTheme.colorScheme.primaryContainer
+    val markerAccentColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.80f)
 
     Box(modifier = modifier.size(size)) {
         Canvas(modifier = Modifier.size(size)) {
@@ -83,7 +92,7 @@ fun AnalogClock(
             val markerLength = radius * 0.28f
             val markerWidth = radius * 0.12f
             val inset = radius * 0.16f
-            drawMarker(center, radius, 0f, markerLength, markerWidth, inset, ChronosColors.PrimaryContainer.copy(alpha = 0.80f))
+            drawMarker(center, radius, 0f, markerLength, markerWidth, inset, markerAccentColor)
             drawMarker(center, radius, 90f, markerLength, markerWidth, inset, ChronosColors.OutlineVariant)
             drawMarker(center, radius, 180f, markerLength, markerWidth, inset, ChronosColors.OutlineVariant)
             drawMarker(center, radius, 270f, markerLength, markerWidth, inset, ChronosColors.OutlineVariant)
@@ -102,7 +111,7 @@ fun AnalogClock(
                 center = center,
                 angle = hourAngle,
                 length = radius * 0.58f,
-                color = ChronosColors.Primary,
+                color = hourHandColor,
                 width = radius * 0.09f,
                 tailLength = radius * 0.10f,
             )
@@ -110,7 +119,7 @@ fun AnalogClock(
                 center = center,
                 angle = minuteAngle,
                 length = radius * 0.72f,
-                color = ChronosColors.PrimaryContainer,
+                color = minuteHandColor,
                 width = radius * 0.06f,
                 tailLength = radius * 0.10f,
             )
@@ -118,19 +127,19 @@ fun AnalogClock(
                 center = center,
                 angle = secondAngle,
                 length = radius * 0.88f,
-                color = ChronosColors.Tertiary,
+                color = secondHandColor,
                 width = radius * 0.028f,
                 tailLength = radius * 0.22f,
             )
 
             // Central pivot nut.
             drawCircle(
-                color = ChronosColors.OnPrimary,
+                color = pivotColor,
                 radius = radius * 0.075f,
                 center = center,
             )
             drawCircle(
-                color = ChronosColors.PrimaryContainer,
+                color = pivotRingColor,
                 radius = radius * 0.075f,
                 center = center,
                 style = Stroke(width = radius * 0.045f),

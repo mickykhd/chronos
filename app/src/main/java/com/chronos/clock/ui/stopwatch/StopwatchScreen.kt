@@ -25,8 +25,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +47,8 @@ import com.chronos.clock.ui.components.ChronosActionButton
 import com.chronos.clock.ui.components.ChronosGauge
 import com.chronos.clock.ui.components.ChronosIcon
 import com.chronos.clock.ui.components.ChronosIconButton
+import com.chronos.clock.ui.components.ChronosOverflowMenu
+import com.chronos.clock.ui.components.OverflowItem
 import com.chronos.clock.ui.components.ChronosTextButton
 import com.chronos.clock.ui.components.ChronosTopBar
 import com.chronos.clock.ui.components.rememberPressState
@@ -58,10 +64,12 @@ import com.chronos.clock.ui.theme.ChronosType
 @OptIn(ExperimentalFoundationApi::class)
 fun StopwatchScreen(
     viewModel: StopwatchViewModel,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val laps by viewModel.laps.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var overflowOpen by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -71,12 +79,22 @@ fun StopwatchScreen(
         stickyHeader(key = "topbar") {
             ChronosTopBar(
                 actions = {
-                    ChronosIconButton(
-                        icon = "more_vert",
-                        contentDescription = "More options",
-                        onClick = { },
-                        tint = ChronosColors.Outline,
-                    )
+                    Box {
+                        ChronosIconButton(
+                            icon = "more_vert",
+                            contentDescription = "More options",
+                            onClick = { overflowOpen = true },
+                            tint = ChronosColors.Outline,
+                        )
+                        ChronosOverflowMenu(
+                            expanded = overflowOpen,
+                            onDismiss = { overflowOpen = false },
+                            items = listOf(
+                                OverflowItem("Reset stopwatch", "replay") { viewModel.reset() },
+                                OverflowItem("Settings", "settings", onOpenSettings),
+                            ),
+                        )
+                    }
                 },
             )
         }
@@ -217,7 +235,7 @@ private fun StopwatchGauge(
                     Text(
                         text = ".%02d".format(hundredths),
                         style = ChronosType.HeadlineMd,
-                        color = ChronosColors.PrimaryContainer,
+                        color = MaterialTheme.colorScheme.primaryContainer,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(start = 2.dp, bottom = 8.dp),
                     )
@@ -225,7 +243,7 @@ private fun StopwatchGauge(
                 Text(
                     text = "Lap $lapCount",
                     style = ChronosType.LabelMd,
-                    color = ChronosColors.Secondary,
+                    color = MaterialTheme.colorScheme.secondary,
                 )
             }
         }
@@ -285,7 +303,7 @@ private fun PlayPausePill(running: Boolean, onClick: () -> Unit) {
             .scale(scale)
             .height(80.dp)
             .clip(RoundedCornerShape(ChronosRadius.Pill))
-            .background(ChronosColors.PrimaryContainer)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable(
                 interactionSource = press.interaction,
                 indication = null,
@@ -300,7 +318,7 @@ private fun PlayPausePill(running: Boolean, onClick: () -> Unit) {
         ChronosIcon(
             name = if (running) "pause" else "play_arrow",
             size = 36.dp,
-            tint = ChronosColors.OnPrimary,
+            tint = MaterialTheme.colorScheme.onPrimary,
             filled = true,
         )
     }
@@ -314,7 +332,7 @@ private fun LapRow(
     modifier: Modifier = Modifier,
 ) {
     val splitColor = when {
-        isFastest -> ChronosColors.TertiaryContainer
+        isFastest -> MaterialTheme.colorScheme.tertiaryContainer
         isSlowest -> ChronosColors.SlowestLap
         else -> ChronosColors.OnSurface
     }
@@ -339,9 +357,9 @@ private fun LapRow(
                 Spacer(Modifier.width(8.dp))
                 LapBadge(
                     text = "Fastest Lap",
-                    container = ChronosColors.TertiaryContainer.copy(alpha = 0.20f),
-                    content = ChronosColors.TertiaryContainer,
-                    border = ChronosColors.TertiaryContainer.copy(alpha = 0.30f),
+                    container = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.20f),
+                    content = MaterialTheme.colorScheme.tertiaryContainer,
+                    border = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.30f),
                 )
             } else if (isSlowest) {
                 Spacer(Modifier.width(8.dp))

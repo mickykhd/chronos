@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -99,8 +100,8 @@ fun ChronosFab(
     modifier: Modifier = Modifier,
     size: Dp = 64.dp,
     iconSize: Dp = 30.dp,
-    container: Color = ChronosColors.PrimaryContainer,
-    content: Color = ChronosColors.OnPrimaryContainer,
+    container: Color = MaterialTheme.colorScheme.primaryContainer,
+    content: Color = MaterialTheme.colorScheme.onPrimaryContainer,
     rotateOnTap: Boolean = false,
 ) {
     val press = rememberPressState()
@@ -116,7 +117,7 @@ fun ChronosFab(
             .shadow(
                 elevation = 12.dp,
                 shape = RoundedCornerShape(ChronosRadius.Fab),
-                ambientColor = ChronosColors.PrimaryContainer.copy(alpha = 0.10f),
+                ambientColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.10f),
                 spotColor = Color.Black.copy(alpha = 0.7f),
             )
             .clip(RoundedCornerShape(ChronosRadius.Fab))
@@ -152,7 +153,7 @@ fun ChronosPill(
     modifier: Modifier = Modifier,
     leadingIcon: String? = null,
     iconFilled: Boolean = false,
-    leadingIconTint: Color = ChronosColors.Primary,
+    leadingIconTint: Color = MaterialTheme.colorScheme.primary,
     leadingIconSize: Dp = 16.dp,
     container: Color = ChronosColors.SurfaceContainerHigh,
     contentColor: Color = ChronosColors.OnSurface,

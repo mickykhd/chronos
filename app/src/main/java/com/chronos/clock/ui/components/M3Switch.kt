@@ -28,6 +28,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import com.chronos.clock.ui.theme.ChronosColors
 import com.chronos.clock.ui.theme.ChronosDimens
+import androidx.compose.material3.MaterialTheme
 
 /**
  * Material 3 switch, built to the spec in the design system:
@@ -46,7 +47,7 @@ fun M3Switch(
     val press = rememberPressState()
 
     val trackColor by animateColorAsState(
-        targetValue = if (checked) ChronosColors.PrimaryContainer else ChronosColors.SurfaceContainerHigh,
+        targetValue = if (checked) MaterialTheme.colorScheme.primaryContainer else ChronosColors.SurfaceContainerHigh,
         animationSpec = spring(dampingRatio = 0.7f, stiffness = 500f),
         label = "switchTrack",
     )
@@ -66,7 +67,7 @@ fun M3Switch(
         label = "switchThumb",
     )
     val thumbColor by animateColorAsState(
-        targetValue = if (checked) ChronosColors.OnPrimary else ChronosColors.Outline,
+        targetValue = if (checked) MaterialTheme.colorScheme.onPrimary else ChronosColors.Outline,
         animationSpec = spring(dampingRatio = 0.7f, stiffness = 500f),
         label = "switchThumbColor",
     )
@@ -115,7 +116,7 @@ fun M3Switch(
                 ChronosIcon(
                     name = "check",
                     size = 14.dp,
-                    tint = ChronosColors.PrimaryContainer,
+                    tint = MaterialTheme.colorScheme.primaryContainer,
                 )
             }
         }

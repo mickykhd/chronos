@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.chronos.clock.ui.theme.ChronosColors
+import androidx.compose.material3.MaterialTheme
 
 /**
  * The dual-ring circular progress indicator from the design system.
@@ -32,7 +33,7 @@ fun ChronosGauge(
     progress: Float,
     modifier: Modifier = Modifier,
     trackColor: Color = ChronosColors.SurfaceContainerHigh,
-    indicatorColor: Color = ChronosColors.PrimaryContainer,
+    indicatorColor: Color = MaterialTheme.colorScheme.primaryContainer,
     trackWidth: Dp = 8.dp,
     indicatorWidth: Dp = 9.dp,
     showTicks: Boolean = false,

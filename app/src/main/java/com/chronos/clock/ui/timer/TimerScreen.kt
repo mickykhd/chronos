@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +50,8 @@ import com.chronos.clock.ui.components.ChronosActionButton
 import com.chronos.clock.ui.components.ChronosGauge
 import com.chronos.clock.ui.components.ChronosIcon
 import com.chronos.clock.ui.components.ChronosIconButton
+import com.chronos.clock.ui.components.ChronosOverflowMenu
+import com.chronos.clock.ui.components.OverflowItem
 import com.chronos.clock.ui.components.ChronosPill
 import com.chronos.clock.ui.components.ChronosTopBar
 import com.chronos.clock.ui.components.pressScale
@@ -70,11 +73,13 @@ private val EndTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:m
 @OptIn(ExperimentalFoundationApi::class)
 fun TimerScreen(
     viewModel: TimerViewModel,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val timers by viewModel.timers.collectAsStateWithLifecycle()
     val active = viewModel.activeTimer
     var showAll by remember { mutableStateOf(false) }
+    var overflowOpen by remember { mutableStateOf(false) }
 
     val others = timers.filter { it.id != active?.id }
 
@@ -92,12 +97,24 @@ fun TimerScreen(
                         onClick = { viewModel.startTimer("Timer", "timer", 5 * 60_000L) },
                         tint = ChronosColors.OnSurface,
                     )
-                    ChronosIconButton(
-                        icon = "more_vert",
-                        contentDescription = "More options",
-                        onClick = { },
-                        tint = ChronosColors.Outline,
-                    )
+                    Box {
+                        ChronosIconButton(
+                            icon = "more_vert",
+                            contentDescription = "More options",
+                            onClick = { overflowOpen = true },
+                            tint = ChronosColors.Outline,
+                        )
+                        ChronosOverflowMenu(
+                            expanded = overflowOpen,
+                            onDismiss = { overflowOpen = false },
+                            items = listOf(
+                                OverflowItem("Add 5 minute timer", "add") {
+                                    viewModel.startTimer("Timer", "timer", 5 * 60_000L)
+                                },
+                                OverflowItem("Settings", "settings", onOpenSettings),
+                            ),
+                        )
+                    }
                 },
             )
         }
@@ -186,13 +203,13 @@ fun TimerScreen(
                     ChronosIcon(
                         name = "add",
                         size = 16.dp,
-                        tint = ChronosColors.Primary,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(Modifier.width(4.dp))
                     Text(
                         text = "New preset",
                         style = ChronosType.LabelMd,
-                        color = ChronosColors.Primary,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
@@ -243,7 +260,7 @@ private fun TimerStatusCapsule(
             modifier = Modifier
                 .size(8.dp)
                 .clip(CircleShape)
-                .background(ChronosColors.PrimaryContainer.copy(alpha = dotAlpha)),
+                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = dotAlpha)),
         )
         Spacer(Modifier.width(8.dp))
         Text(
@@ -260,7 +277,7 @@ private fun TimerStatusCapsule(
             Text(
                 text = "View all",
                 style = ChronosType.LabelSm,
-                color = ChronosColors.Primary,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .clickable(onClick = onViewAll)
                     .padding(vertical = 2.dp),
@@ -288,13 +305,13 @@ private fun TimerGauge(
                         ChronosIcon(
                             name = timer.icon,
                             size = 18.dp,
-                            tint = ChronosColors.Primary,
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
                             text = timer.label,
                             style = ChronosType.LabelLg,
-                            color = ChronosColors.Primary,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                     Text(
@@ -342,7 +359,7 @@ private fun TimerGauge(
             ChronosPill(
                 text = "+1:00",
                 leadingIcon = "add",
-                leadingIconTint = ChronosColors.Primary,
+                leadingIconTint = MaterialTheme.colorScheme.primary,
                 container = ChronosColors.SurfaceContainerHigh,
                 onClick = { timer?.let { onAddMinute(it, 1) } },
                 enabled = timer != null,
@@ -350,7 +367,7 @@ private fun TimerGauge(
             ChronosPill(
                 text = "+5:00",
                 leadingIcon = "add",
-                leadingIconTint = ChronosColors.Primary,
+                leadingIconTint = MaterialTheme.colorScheme.primary,
                 container = ChronosColors.SurfaceContainerHigh,
                 onClick = { timer?.let { onAddMinute(it, 5) } },
                 enabled = timer != null,
@@ -417,7 +434,7 @@ private fun PlayPauseButton(
             .size(ChronosDimens.PlayButtonSize)
             .scale(scale)
             .clip(RoundedCornerShape(ChronosRadius.PlayButton))
-            .background(if (enabled) ChronosColors.PrimaryContainer else ChronosColors.SurfaceContainerHigh)
+            .background(if (enabled) MaterialTheme.colorScheme.primaryContainer else ChronosColors.SurfaceContainerHigh)
             .clickable(
                 interactionSource = press.interaction,
                 indication = null,
@@ -432,7 +449,7 @@ private fun PlayPauseButton(
         ChronosIcon(
             name = if (running) "pause" else "play_arrow",
             size = 36.dp,
-            tint = if (enabled) ChronosColors.OnPrimaryContainer else ChronosColors.Outline,
+            tint = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer else ChronosColors.Outline,
             filled = true,
         )
     }
@@ -457,13 +474,13 @@ private fun SecondaryTimerRow(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(ChronosColors.SecondaryContainer),
+                .background(MaterialTheme.colorScheme.secondaryContainer),
             contentAlignment = Alignment.Center,
         ) {
             ChronosIcon(
                 name = timer.icon,
                 size = 20.dp,
-                tint = ChronosColors.Primary,
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
         Spacer(Modifier.width(12.dp))
@@ -532,10 +549,10 @@ private fun PresetCard(
 ) {
     val press = rememberPressState()
     val iconTint = when (preset.icon) {
-        "local_cafe" -> ChronosColors.TertiaryFixed
-        "egg" -> ChronosColors.Secondary
-        "self_improvement" -> ChronosColors.Primary
-        else -> ChronosColors.TertiaryFixedDim
+        "local_cafe" -> MaterialTheme.colorScheme.tertiary
+        "egg" -> MaterialTheme.colorScheme.secondary
+        "self_improvement" -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.tertiaryContainer
     }
 
     Column(
@@ -582,7 +599,7 @@ private fun PresetCard(
                 ChronosIcon(
                     name = "play_arrow",
                     size = 18.dp,
-                    tint = ChronosColors.Primary,
+                    tint = MaterialTheme.colorScheme.primary,
                     filled = true,
                 )
             }

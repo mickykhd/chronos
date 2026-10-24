@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -58,9 +62,14 @@ fun ChronosTopBar(
     title: String = "Clock",
     onLeadingClick: (() -> Unit)? = null,
     leadingIcon: String = "alarm",
-    leadingTint: Color = ChronosColors.Primary,
+    leadingTint: Color = MaterialTheme.colorScheme.primary,
+    searchQuery: String? = null,
+    onSearchQueryChange: ((String) -> Unit)? = null,
+    onSearchClose: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
+    val searching = searchQuery != null
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -69,25 +78,71 @@ fun ChronosTopBar(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ChronosIconButton(
-            icon = leadingIcon,
-            contentDescription = leadingIcon,
-            onClick = { onLeadingClick?.invoke() },
-            tint = leadingTint,
-        )
-        Text(
-            text = title,
-            style = ChronosType.HeadlineSm,
-            color = ChronosColors.OnSurface,
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .weight(1f),
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            content = actions,
-        )
+        if (searching) {
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(44.dp)
+                    .clip(RoundedCornerShape(ChronosRadius.Pill))
+                    .background(ChronosColors.SurfaceContainerLow)
+                    .padding(horizontal = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                ChronosIcon(
+                    name = "search",
+                    size = 20.dp,
+                    tint = ChronosColors.Outline,
+                )
+                Spacer(Modifier.width(10.dp))
+                androidx.compose.foundation.text.BasicTextField(
+                    value = searchQuery.orEmpty(),
+                    onValueChange = { onSearchQueryChange?.invoke(it) },
+                    singleLine = true,
+                    textStyle = ChronosType.BodyLg.copy(color = ChronosColors.OnSurface),
+                    cursorBrush = androidx.compose.ui.graphics.SolidColor(
+                        MaterialTheme.colorScheme.primaryContainer,
+                    ),
+                    modifier = Modifier.weight(1f),
+                    decorationBox = { inner ->
+                        if (searchQuery.orEmpty().isEmpty()) {
+                            Text(
+                                text = "Search cities",
+                                style = ChronosType.BodyLg,
+                                color = ChronosColors.Outline,
+                            )
+                        }
+                        inner()
+                    },
+                )
+            }
+            Spacer(Modifier.width(4.dp))
+            ChronosIconButton(
+                icon = "close",
+                contentDescription = "Close search",
+                onClick = { onSearchClose?.invoke() },
+                tint = ChronosColors.OnSurface,
+            )
+        } else {
+            ChronosIconButton(
+                icon = leadingIcon,
+                contentDescription = leadingIcon,
+                onClick = { onLeadingClick?.invoke() },
+                tint = leadingTint,
+            )
+            Text(
+                text = title,
+                style = ChronosType.HeadlineSm,
+                color = ChronosColors.OnSurface,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .weight(1f),
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                content = actions,
+            )
+        }
     }
 }
 
@@ -101,8 +156,8 @@ fun IconWell(
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
     iconSize: Dp = 20.dp,
-    container: Color = ChronosColors.SecondaryContainer,
-    content: Color = ChronosColors.PrimaryContainer,
+    container: Color = MaterialTheme.colorScheme.secondaryContainer,
+    content: Color = MaterialTheme.colorScheme.primaryContainer,
     filled: Boolean = false,
 ) {
     Box(

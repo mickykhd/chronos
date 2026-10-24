@@ -30,17 +30,9 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
         if (alarm.enabled) AlarmScheduler.schedule(context, alarm) else AlarmScheduler.cancel(context, alarm)
     }
 
-    fun addAlarm(hour: Int, minute: Int, label: String) {
-        val alarm = Alarm(
-            id = ChronosRepository.newId(),
-            hour = hour,
-            minute = minute,
-            label = label.ifBlank { "Alarm" },
-            days = emptySet(),
-            enabled = true,
-        )
+    fun addAlarm(alarm: Alarm) {
         repository.addAlarm(alarm)
-        AlarmScheduler.schedule(context, alarm)
+        if (alarm.enabled) AlarmScheduler.schedule(context, alarm)
     }
 
     fun updateAlarm(alarm: Alarm) {

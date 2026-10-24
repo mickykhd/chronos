@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,6 +54,10 @@ import com.chronos.clock.ui.components.AnalogClock
 import com.chronos.clock.ui.components.ChronosFab
 import com.chronos.clock.ui.components.ChronosIcon
 import com.chronos.clock.ui.components.ChronosIconButton
+import com.chronos.clock.ui.components.ChronosOverflowMenu
+import com.chronos.clock.ui.components.ChronosPill
+import com.chronos.clock.ui.components.IconWell
+import com.chronos.clock.ui.components.OverflowItem
 import com.chronos.clock.ui.components.ChronosTextButton
 import com.chronos.clock.ui.components.ChronosTopBar
 import com.chronos.clock.ui.components.rememberRevealState
@@ -68,7 +75,9 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 private val HeroTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mm")
+private val HeroTime24Format: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val CityTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("hh:mm")
+private val CityTime24Format: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private val DateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE, MMM d")
 
 @Composable
@@ -77,10 +86,12 @@ fun ClockScreen(
     viewModel: ClockViewModel,
     onAddCity: () -> Unit,
     onCompareTimes: () -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val now by rememberNow(viewModel.localZone)
     val cities by viewModel.cities.collectAsStateWithLifecycle()
+    val use24Hour by viewModel.use24Hour.collectAsStateWithLifecycle()
 
     var weather by remember { mutableStateOf<Map<String, Weather.Current>>(emptyMap()) }
     LaunchedEffect(cities) {
@@ -95,8 +106,10 @@ fun ClockScreen(
         cities = cities,
         weather = weather,
         localZone = viewModel.localZone,
+        use24Hour = use24Hour,
         onAddCity = onAddCity,
         onCompareTimes = onCompareTimes,
+        onOpenSettings = onOpenSettings,
         modifier = modifier,
     )
 }
@@ -109,11 +122,27 @@ private fun ClockScreenContent(
     cities: List<WorldCity>,
     weather: Map<String, Weather.Current>,
     localZone: ZoneId,
+    use24Hour: Boolean,
     onAddCity: () -> Unit,
     onCompareTimes: () -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+    var searchActive by remember { mutableStateOf(false) }
+    var query by remember { mutableStateOf("") }
+    var overflowOpen by remember { mutableStateOf(false) }
+
+    val visibleCities = remember(cities, query) {
+        if (query.isBlank()) {
+            cities
+        } else {
+            cities.filter {
+                it.city.contains(query, ignoreCase = true) ||
+                    it.country.contains(query, ignoreCase = true)
+            }
+        }
+    }
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val isWide = maxWidth >= 600.dp
 
         LazyColumn(
@@ -125,19 +154,36 @@ private fun ClockScreenContent(
         ) {
             stickyHeader(key = "topbar") {
                 ChronosTopBar(
+                    searchQuery = if (searchActive) query else null,
+                    onSearchQueryChange = { query = it },
+                    onSearchClose = {
+                        searchActive = false
+                        query = ""
+                    },
                     actions = {
                         ChronosIconButton(
                             icon = "search",
                             contentDescription = "Search cities",
-                            onClick = { },
+                            onClick = { searchActive = true },
                             tint = ChronosColors.Outline,
                         )
-                        ChronosIconButton(
-                            icon = "more_vert",
-                            contentDescription = "More options",
-                            onClick = { },
-                            tint = ChronosColors.Outline,
-                        )
+                        Box {
+                            ChronosIconButton(
+                                icon = "more_vert",
+                                contentDescription = "More options",
+                                onClick = { overflowOpen = true },
+                                tint = ChronosColors.Outline,
+                            )
+                            ChronosOverflowMenu(
+                                expanded = overflowOpen,
+                                onDismiss = { overflowOpen = false },
+                                items = listOf(
+                                    OverflowItem("Add city", "add") { onAddCity() },
+                                    OverflowItem("Compare times", "compare_arrows", onCompareTimes),
+                                    OverflowItem("Settings", "settings", onOpenSettings),
+                                ),
+                            )
+                        }
                     },
                 )
             }
@@ -157,6 +203,7 @@ private fun ClockScreenContent(
                                 zoneDescription = zoneDescription,
                                 sunTimes = sunTimes,
                                 weather = weather[localZone.id],
+                                use24Hour = use24Hour,
                                 modifier = Modifier.weight(7f),
                             )
                             AnalogCard(
@@ -170,6 +217,7 @@ private fun ClockScreenContent(
                                 zoneDescription = zoneDescription,
                                 sunTimes = sunTimes,
                                 weather = weather[localZone.id],
+                                use24Hour = use24Hour,
                                 modifier = Modifier.fillMaxWidth(),
                             )
                             AnalogCard(modifier = Modifier.fillMaxWidth())
@@ -194,7 +242,11 @@ private fun ClockScreenContent(
                             color = ChronosColors.OnSurface,
                         )
                         Text(
-                            text = "${cities.size} pinned international hubs",
+                            text = when (cities.size) {
+                                0 -> "No cities pinned yet"
+                                1 -> "1 pinned international hub"
+                                else -> "${cities.size} pinned international hubs"
+                            },
                             style = ChronosType.BodyMd,
                             color = ChronosColors.Outline,
                         )
@@ -209,12 +261,35 @@ private fun ClockScreenContent(
                 }
             }
 
-            items(cities, key = { it.id }) { city ->
+            if (cities.isEmpty()) {
+                item(key = "empty-cities") {
+                    val reveal = rememberRevealState(index = 2)
+                    EmptyCitiesCard(
+                        onAddCity = onAddCity,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .reveal(reveal),
+                    )
+                }
+            } else if (visibleCities.isEmpty()) {
+                item(key = "no-results") {
+                    Text(
+                        text = "No cities match your search",
+                        style = ChronosType.BodyLg,
+                        color = ChronosColors.Outline,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
+                    )
+                }
+            }
+
+            items(visibleCities, key = { it.id }) { city ->
                 val reveal = rememberRevealState(index = cities.indexOf(city) + 2)
                 WorldClockCard(
                     city = city,
                     now = now,
                     weather = weather[city.zoneId],
+                    use24Hour = use24Hour,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -254,6 +329,7 @@ private fun HeroCard(
     zoneDescription: ZoneDescription,
     sunTimes: SunTimes.Result,
     weather: Weather.Current?,
+    use24Hour: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -271,7 +347,7 @@ private fun HeroCard(
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            ChronosColors.PrimaryContainer.copy(alpha = 0.10f),
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.10f),
                             Color.Transparent,
                         ),
                     ),
@@ -289,9 +365,9 @@ private fun HeroCard(
                     icon = "home",
                     text = "Home",
                     filled = true,
-                    container = ChronosColors.SecondaryContainer.copy(alpha = 0.40f),
-                    content = ChronosColors.Secondary,
-                    border = ChronosColors.Secondary.copy(alpha = 0.20f),
+                    container = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.40f),
+                    content = MaterialTheme.colorScheme.secondary,
+                    border = MaterialTheme.colorScheme.secondary.copy(alpha = 0.20f),
                 )
                 weather?.let {
                     InfoPill(
@@ -310,13 +386,15 @@ private fun HeroCard(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    text = now.format(HeroTimeFormat),
+                    text = now.format(if (use24Hour) HeroTime24Format else HeroTimeFormat),
                     style = ChronosType.DisplayHeroMobile,
                     color = ChronosColors.OnSurface,
                     modifier = Modifier.alignByBaseline(),
                 )
-                Spacer(Modifier.width(8.dp))
-                MeridiemBadge(now.hour, Modifier.alignByBaseline())
+                if (!use24Hour) {
+                    Spacer(Modifier.width(8.dp))
+                    MeridiemBadge(now.hour, Modifier.alignByBaseline())
+                }
             }
 
             Row(
@@ -374,7 +452,7 @@ private fun HeroCard(
                     Text(
                         text = "Sunrise in ${formatCoarseDuration(it)}",
                         style = ChronosType.LabelMd,
-                        color = ChronosColors.Tertiary,
+                        color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -414,7 +492,7 @@ private fun AnalogCard(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(ChronosColors.PrimaryContainer.copy(alpha = dotAlpha)),
+                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = dotAlpha)),
             )
             Spacer(Modifier.width(8.dp))
             Text(
@@ -445,13 +523,13 @@ private fun CoordinateStrip(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(ChronosColors.SecondaryContainer),
+                .background(MaterialTheme.colorScheme.secondaryContainer),
             contentAlignment = Alignment.Center,
         ) {
             ChronosIcon(
                 name = "public",
                 size = 22.dp,
-                tint = ChronosColors.Primary,
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
         Spacer(Modifier.width(10.dp))
@@ -483,6 +561,7 @@ private fun WorldClockCard(
     city: WorldCity,
     now: ZonedDateTime,
     weather: Weather.Current?,
+    use24Hour: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val zone = remember(city.zoneId) { ZoneId.of(city.zoneId) }
@@ -524,18 +603,20 @@ private fun WorldClockCard(
             verticalAlignment = Alignment.Bottom,
         ) {
             Text(
-                text = cityTime.format(CityTimeFormat),
+                text = cityTime.format(if (use24Hour) CityTime24Format else CityTimeFormat),
                 style = ChronosType.HeadlineLg,
                 color = ChronosColors.OnSurface,
             )
             Spacer(Modifier.weight(1f))
-            Text(
-                text = if (cityTime.hour < 12) "AM" else "PM",
-                style = ChronosType.LabelMd,
-                color = ChronosColors.Outline,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(bottom = 6.dp),
-            )
+            if (!use24Hour) {
+                Text(
+                    text = if (cityTime.hour < 12) "AM" else "PM",
+                    style = ChronosType.LabelMd,
+                    color = ChronosColors.Outline,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                )
+            }
         }
 
         HairlineDivider(modifier = Modifier.padding(top = 8.dp))
@@ -549,7 +630,7 @@ private fun WorldClockCard(
             Text(
                 text = offsetLabel(now, cityTime),
                 style = ChronosType.LabelMd,
-                color = ChronosColors.Secondary,
+                color = MaterialTheme.colorScheme.secondary,
             )
             Spacer(Modifier.weight(1f))
             weather?.let {
@@ -566,6 +647,57 @@ private fun WorldClockCard(
                 )
             }
         }
+    }
+}
+
+/**
+ * Shown when no cities are pinned yet — the app starts clean, so the list is only
+ * populated by the user.
+ */
+@Composable
+private fun EmptyCitiesCard(
+    onAddCity: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(ChronosRadius.Card))
+            .background(ChronosColors.SurfaceContainerLow)
+            .border(1.dp, ChronosColors.GhostBorder, RoundedCornerShape(ChronosRadius.Card))
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        IconWell(
+            icon = "public",
+            size = 56.dp,
+            iconSize = 28.dp,
+            container = MaterialTheme.colorScheme.secondaryContainer,
+            content = MaterialTheme.colorScheme.primary,
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = "No world clocks yet",
+            style = ChronosType.TitleLg,
+            color = ChronosColors.OnSurface,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = "Pin a city to see the local time, weather and day/night there.",
+            style = ChronosType.BodyMd,
+            color = ChronosColors.Outline,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(20.dp))
+        ChronosPill(
+            text = "Add a city",
+            leadingIcon = "add",
+            leadingIconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+            container = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            textStyle = ChronosType.LabelLg,
+            height = 48.dp,
+            onClick = onAddCity,
+        )
     }
 }
 
@@ -637,11 +769,11 @@ private fun MeridiemBadge(hour: Int, modifier: Modifier = Modifier) {
     Text(
         text = if (hour < 12) "AM" else "PM",
         style = ChronosType.LabelMd,
-        color = ChronosColors.OnPrimaryContainer,
+        color = MaterialTheme.colorScheme.onPrimaryContainer,
         fontWeight = FontWeight.Bold,
         modifier = modifier
             .clip(RoundedCornerShape(ChronosRadius.Pill))
-            .background(ChronosColors.PrimaryContainer)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(horizontal = 8.dp, vertical = 2.dp),
     )
 }
@@ -653,12 +785,16 @@ private data class DayPart(
     val content: Color,
 )
 
-private fun dayPartOf(hour: Int): DayPart = when (hour) {
-    in 0..4 -> DayPart("Night", "bedtime", ChronosColors.SurfaceContainerHighest, ChronosColors.OnSurfaceVariant)
-    in 5..7 -> DayPart("Dawn", "wb_twilight", ChronosColors.SecondaryContainer.copy(alpha = 0.30f), ChronosColors.Secondary)
-    in 8..16 -> DayPart("Day", "wb_sunny", ChronosColors.TertiaryContainer.copy(alpha = 0.20f), ChronosColors.Tertiary)
-    in 17..21 -> DayPart("Evening", "wb_twilight", ChronosColors.SecondaryContainer.copy(alpha = 0.30f), ChronosColors.Secondary)
-    else -> DayPart("Night", "bedtime", ChronosColors.SurfaceContainerHighest, ChronosColors.OnSurfaceVariant)
+@Composable
+private fun dayPartOf(hour: Int): DayPart {
+    val scheme = MaterialTheme.colorScheme
+    return when (hour) {
+        in 0..4 -> DayPart("Night", "bedtime", scheme.surfaceContainerHighest, scheme.onSurfaceVariant)
+        in 5..7 -> DayPart("Dawn", "wb_twilight", scheme.secondaryContainer.copy(alpha = 0.30f), scheme.secondary)
+        in 8..16 -> DayPart("Day", "wb_sunny", scheme.tertiaryContainer.copy(alpha = 0.20f), scheme.tertiary)
+        in 17..21 -> DayPart("Evening", "wb_twilight", scheme.secondaryContainer.copy(alpha = 0.30f), scheme.secondary)
+        else -> DayPart("Night", "bedtime", scheme.surfaceContainerHighest, scheme.onSurfaceVariant)
+    }
 }
 
 /** `Today, +8 hrs` / `Tomorrow, +16 hrs` */

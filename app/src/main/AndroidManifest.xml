@@ -41,6 +41,17 @@
             </intent-filter>
         </activity>
 
+        <!-- The full-screen alarm UI, shown over the lock screen while ringing. -->
+        <activity
+            android:name=".ui.alarm.AlarmRingActivity"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:taskAffinity=".alarm"
+            android:theme="@style/Theme.Chronos" />
+
         <!-- Keeps the running-timer notification alive and updates its countdown. -->
         <service
             android:name=".service.TimerService"
@@ -59,6 +70,11 @@
 
         <receiver
             android:name=".service.AlarmReceiver"
+            android:exported="false" />
+
+        <!-- Dismiss / snooze actions on the ringing alarm notification. -->
+        <receiver
+            android:name=".service.AlarmActionReceiver"
             android:exported="false" />
 
         <receiver

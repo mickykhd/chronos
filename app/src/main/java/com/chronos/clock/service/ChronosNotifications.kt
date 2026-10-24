@@ -93,10 +93,16 @@ object ChronosNotifications {
 
     fun alarmNotification(context: Context, alarm: Alarm): Notification {
         val fullScreen = openAppIntent(context, alarm.id.hashCode(), EXTRA_RINGING)
+        val subtitle = buildString {
+            append(alarm.label)
+            if (alarm.soundTitle.isNotBlank() && alarm.soundTitle != "Default") {
+                append(" · ").append(alarm.soundTitle)
+            }
+        }
         return NotificationCompat.Builder(context, ALARM_CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(alarm.timeText12())
-            .setContentText(alarm.label)
+            .setContentText(subtitle)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(Notification.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -104,7 +110,17 @@ object ChronosNotifications {
             .setOngoing(true)
             .setContentIntent(fullScreen)
             .setFullScreenIntent(fullScreen, true)
-            .setVibrate(longArrayOf(0, 500, 500, 500, 500, 500, 500, 500))
+            .setSilent(true)
+            .addAction(
+                0,
+                "Dismiss",
+                AlarmActionReceiver.dismissIntent(context, alarm.id),
+            )
+            .addAction(
+                0,
+                "Snooze",
+                AlarmActionReceiver.snoozeIntent(context, alarm.id),
+            )
             .build()
     }
 

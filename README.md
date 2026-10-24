@@ -18,15 +18,31 @@ Android 8.0 (API 26) and newer.
 ## Features
 
 ### 🔔 Alarm
+- A **full-screen alarm editor** — the same set of options a phone clock exposes:
+  time, repeat days, label, **sound**, **vibration pattern** and **snooze**.
+- A **hand-built animated dial** for picking the time. The Material 3 `TimePicker`
+  renders a display row far too large for a dialog on a phone (the digits clip), so
+  Chronos draws its own: the numbers never overflow, the selection slides between
+  positions, and the hand springs to wherever your finger lands.
+- **Sound picker** listing the ringtones, alarm tones and notification sounds
+  actually installed on the device, read live from the media store.
+- **Vibration patterns** — off, standard, twice or continuous.
 - Repeating schedules with ISO day-of-week selection (M T W T F S S pills).
 - Material 3 switches built to spec: 52×32 dp track, 24 dp thumb, check glyph when on.
 - **Real scheduling** through `AlarmManager.setExactAndAllowWhileIdle` — the alarm
   fires even if the app is not running, and alarms are re-booked after a reboot.
-- Full-screen-intent notification with the system alarm tone, a wake lock, and a
-  dismissable ringing dialog.
-- A bedtime / sleep-schedule card with the rest-hours summary.
+- **A real ringtone.** The tone is played with an explicit `MediaPlayer` on the
+  alarm stream with audio focus, alongside the vibration pattern, and it keeps
+  playing until the alarm is dismissed or snoozed.
+- A **full-screen alarm UI** that shows over the lock screen with the screen woken,
+  plus Dismiss and Snooze actions on the notification itself.
+- A bedtime / sleep-schedule card you can switch on from the overflow menu.
+
+> A fresh install starts **completely empty** — no demo alarms and no pinned cities.
+> The app never pre-fills data you did not create.
 
 ### 🕐 Clock
+- **Search** that filters your pinned cities by name or country.
 - Live local time in a `display-hero` readout with a `display-hero-mobile` fallback.
 - A **live analog dial** whose second hand sweeps continuously (60 s linear)
   rather than ticking, rendered entirely on the Compose canvas.
@@ -53,6 +69,19 @@ Android 8.0 (API 26) and newer.
 - Share laps to any app via `ACTION_SEND`.
 
 ---
+
+## Colour themes
+
+Six accent palettes ship with the app, selectable in **Settings**: **Ember** (the
+original Chronos M3 key colour), **Aurora**, **Orchid**, **Solar**, **Frost** and
+**Graphite**.
+
+The surface tiers never change — the app stays true OLED black in every theme — so
+switching theme changes the key colour without losing the night-optimised
+foundation the design system is built on. Your choice is remembered.
+
+A **24-hour format** setting is there too, and applies to the hero clock, the
+world clocks and the alarm editor.
 
 ## Design system
 
@@ -86,6 +115,8 @@ Motion is a first-class part of the design system, not an afterthought:
 - **Material 3 Expressive motion tokens** live in
   [`ChronosMotion`](app/src/main/java/com/chronos/clock/ui/theme/Motion.kt) —
   emphasized curves plus tuned springs.
+- **A working overflow menu on every tab** (Settings, Add alarm, Add city, Compare
+  times, Bedtime mode) and a **working search field** on the world clock.
 
 ---
 

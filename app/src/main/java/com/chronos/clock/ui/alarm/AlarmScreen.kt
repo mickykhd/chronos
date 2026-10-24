@@ -3,6 +3,7 @@ package com.chronos.clock.ui.alarm
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,16 +17,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chronos.clock.core.rememberNow
@@ -44,10 +48,12 @@ import com.chronos.clock.data.Alarm
 import com.chronos.clock.ui.components.ChronosFab
 import com.chronos.clock.ui.components.ChronosIcon
 import com.chronos.clock.ui.components.ChronosIconButton
+import com.chronos.clock.ui.components.ChronosOverflowMenu
 import com.chronos.clock.ui.components.ChronosPill
 import com.chronos.clock.ui.components.ChronosTopBar
 import com.chronos.clock.ui.components.IconWell
 import com.chronos.clock.ui.components.M3Switch
+import com.chronos.clock.ui.components.OverflowItem
 import com.chronos.clock.ui.components.pressScale
 import com.chronos.clock.ui.components.rememberPressState
 import com.chronos.clock.ui.components.rememberRevealState
@@ -60,100 +66,173 @@ import com.chronos.clock.ui.theme.ChronosType
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 private val DayLetters = listOf("M", "T", "W", "T", "F", "S", "S")
 private val IsoDays = listOf(1, 2, 3, 4, 5, 6, 7)
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 fun AlarmScreen(
     viewModel: AlarmViewModel,
+    onAddAlarm: () -> Unit,
+    onEditAlarm: (String) -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val alarms by viewModel.alarms.collectAsStateWithLifecycle()
     val sleepSchedule by viewModel.sleepSchedule.collectAsStateWithLifecycle()
     val now by rememberNow()
+    var overflowOpen by remember { mutableStateOf(false) }
 
-    var showAddDialog by remember { mutableStateOf(false) }
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(bottom = 140.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            stickyHeader(key = "topbar") {
+                ChronosTopBar(
+                    actions = {
+                        ChronosIconButton(
+                            icon = "more_vert",
+                            contentDescription = "More options",
+                            onClick = { overflowOpen = true },
+                            tint = ChronosColors.Outline,
+                        )
+                        Box {
+                            ChronosOverflowMenu(
+                                expanded = overflowOpen,
+                                onDismiss = { overflowOpen = false },
+                                items = listOf(
+                                    OverflowItem("Add alarm", "add_alarm") { onAddAlarm() },
+                                    OverflowItem(
+                                        label = if (sleepSchedule.enabled) "Hide bedtime mode" else "Bedtime mode",
+                                        icon = "bedtime",
+                                    ) {
+                                        viewModel.updateSleepSchedule(
+                                            sleepSchedule.copy(enabled = !sleepSchedule.enabled),
+                                        )
+                                    },
+                                    OverflowItem("Settings", "settings", onOpenSettings),
+                                ),
+                            )
+                        }
+                    },
+                )
+            }
 
-    Box(modifier = modifier.fillMaxWidth()) {
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(bottom = 120.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        stickyHeader(key = "topbar") {
-            ChronosTopBar(
-                actions = {
-                    ChronosIconButton(
-                        icon = "more_vert",
-                        contentDescription = "More options",
-                        onClick = { },
-                        tint = ChronosColors.Outline,
+            if (alarms.isEmpty()) {
+                item(key = "empty") {
+                    val reveal = rememberRevealState(index = 0)
+                    EmptyAlarmsCard(
+                        onAddAlarm = onAddAlarm,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .reveal(reveal),
                     )
-                },
-            )
-        }
+                }
+            } else {
+                item(key = "banner") {
+                    val reveal = rememberRevealState(index = 0)
+                    UpcomingAlarmBanner(
+                        alarms = alarms,
+                        now = now,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .reveal(reveal),
+                    )
+                }
+            }
 
-        item(key = "banner") {
-            val reveal = rememberRevealState(index = 0)
-            UpcomingAlarmBanner(
-                alarms = alarms,
-                now = now,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .reveal(reveal),
-            )
-        }
+            items(alarms, key = { it.id }) { alarm ->
+                val reveal = rememberRevealState(index = alarms.indexOf(alarm) + 1)
+                AlarmCard(
+                    alarm = alarm,
+                    now = now,
+                    onToggle = { enabled -> viewModel.toggle(alarm.id, enabled) },
+                    onToggleDay = { day -> viewModel.toggleDay(alarm.id, day) },
+                    onClick = { onEditAlarm(alarm.id) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .reveal(reveal),
+                )
+            }
 
-        items(alarms, key = { it.id }) { alarm ->
-            val reveal = rememberRevealState(index = alarms.indexOf(alarm) + 1)
-            AlarmCard(
-                alarm = alarm,
-                now = now,
-                onToggle = { enabled -> viewModel.toggle(alarm.id, enabled) },
-                onToggleDay = { day -> viewModel.toggleDay(alarm.id, day) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .reveal(reveal),
-            )
+            if (sleepSchedule.enabled) {
+                item(key = "bedtime") {
+                    val reveal = rememberRevealState(index = alarms.size + 1)
+                    BedtimeCard(
+                        bedtime = sleepSchedule.bedtimeText(),
+                        wake = sleepSchedule.wakeText(),
+                        rest = sleepSchedule.restHoursText(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .reveal(reveal),
+                    )
+                }
+            }
         }
-
-        item(key = "bedtime") {
-            val reveal = rememberRevealState(index = alarms.size + 1)
-            BedtimeCard(
-                bedtime = sleepSchedule.bedtimeText(),
-                wake = sleepSchedule.wakeText(),
-                rest = sleepSchedule.restHoursText(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .reveal(reveal),
-            )
-        }
-    }
 
         ChronosFab(
             icon = "add",
             contentDescription = "Add new alarm",
-            onClick = { showAddDialog = true },
+            onClick = onAddAlarm,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 20.dp, bottom = 96.dp),
         )
     }
+}
 
-    if (showAddDialog) {
-        AddAlarmDialog(
-            onDismiss = { showAddDialog = false },
-            onConfirm = { hour, minute ->
-                viewModel.addAlarm(hour, minute, "Alarm")
-                showAddDialog = false
-            },
+@Composable
+private fun EmptyAlarmsCard(
+    onAddAlarm: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(ChronosRadius.AlarmCard))
+            .background(ChronosColors.SurfaceContainerLow)
+            .border(1.dp, ChronosColors.GhostBorder, RoundedCornerShape(ChronosRadius.AlarmCard))
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        IconWell(
+            icon = "alarm",
+            size = 56.dp,
+            iconSize = 28.dp,
+            container = MaterialTheme.colorScheme.secondaryContainer,
+            content = MaterialTheme.colorScheme.primaryContainer,
+            filled = true,
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = "No alarms yet",
+            style = ChronosType.TitleLg,
+            color = ChronosColors.OnSurface,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = "Create an alarm and Chronos will ring it for you — even when the app is closed.",
+            style = ChronosType.BodyMd,
+            color = ChronosColors.Outline,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(20.dp))
+        ChronosPill(
+            text = "Create alarm",
+            leadingIcon = "add",
+            leadingIconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+            container = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            textStyle = ChronosType.LabelLg,
+            height = 48.dp,
+            onClick = onAddAlarm,
         )
     }
 }
@@ -193,8 +272,8 @@ private fun UpcomingAlarmBanner(
             icon = "notifications_active",
             size = 40.dp,
             iconSize = 20.dp,
-            container = ChronosColors.SecondaryContainer.copy(alpha = 0.60f),
-            content = ChronosColors.PrimaryContainer,
+            container = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.60f),
+            content = MaterialTheme.colorScheme.primaryContainer,
             filled = true,
         )
         Spacer(Modifier.width(14.dp))
@@ -213,28 +292,16 @@ private fun UpcomingAlarmBanner(
                 style = ChronosType.TitleMd,
                 color = ChronosColors.OnSurface,
                 maxLines = 1,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         Spacer(Modifier.width(8.dp))
         Text(
-            text = "Dismiss",
+            text = next?.first?.label.orEmpty(),
             style = ChronosType.LabelMd,
-            color = ChronosColors.Primary,
-            modifier = Modifier
-                .clip(RoundedCornerShape(ChronosRadius.Pill))
-                .clickable { }
-                .padding(horizontal = 12.dp, vertical = 6.dp),
-        )
-        Text(
-            text = "Change",
-            style = ChronosType.LabelMd,
-            color = ChronosColors.OnSurface,
-            modifier = Modifier
-                .clip(RoundedCornerShape(ChronosRadius.Pill))
-                .background(ChronosColors.SurfaceContainer)
-                .clickable { }
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+            color = MaterialTheme.colorScheme.primaryContainer,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -245,6 +312,7 @@ private fun AlarmCard(
     now: ZonedDateTime,
     onToggle: (Boolean) -> Unit,
     onToggleDay: (Int) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember(alarm.id) { mutableStateOf(alarm.enabled) }
@@ -268,8 +336,8 @@ private fun AlarmCard(
         label = "alarmCardBorder",
     )
 
-    val timeColor = if (alarm.enabled) ChronosColors.Primary else ChronosColors.Outline.copy(alpha = 0.60f)
-    val meridiemColor = if (alarm.enabled) ChronosColors.Secondary else ChronosColors.Outline.copy(alpha = 0.40f)
+    val timeColor = if (alarm.enabled) MaterialTheme.colorScheme.primary else ChronosColors.Outline.copy(alpha = 0.60f)
+    val meridiemColor = if (alarm.enabled) MaterialTheme.colorScheme.secondary else ChronosColors.Outline.copy(alpha = 0.40f)
     val labelColor = if (alarm.enabled) ChronosColors.OnSurface else ChronosColors.Outline
     val metaColor = if (alarm.enabled) ChronosColors.Outline else ChronosColors.Outline.copy(alpha = 0.70f)
 
@@ -278,6 +346,7 @@ private fun AlarmCard(
             .clip(RoundedCornerShape(ChronosRadius.AlarmCard))
             .background(container)
             .border(1.dp, borderColor, RoundedCornerShape(ChronosRadius.AlarmCard))
+            .clickable(onClick = onClick)
             .padding(16.dp),
     ) {
         Row(verticalAlignment = Alignment.Top) {
@@ -309,6 +378,7 @@ private fun AlarmCard(
                         color = labelColor,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(Modifier.width(6.dp))
                     Box(
@@ -359,65 +429,60 @@ private fun AlarmCard(
 
         AnimatedVisibility(
             visible = expanded,
-            enter = fadeIn(animationSpec = androidx.compose.animation.core.tween(ChronosMotion.Medium1)) +
+            enter = fadeIn(animationSpec = tween(ChronosMotion.Medium1)) +
                 expandVertically(animationSpec = spring(dampingRatio = 0.85f, stiffness = 320f)),
-            exit = fadeOut(animationSpec = androidx.compose.animation.core.tween(ChronosMotion.Short3)) +
+            exit = fadeOut(animationSpec = tween(ChronosMotion.Short3)) +
                 shrinkVertically(animationSpec = spring(dampingRatio = 0.85f, stiffness = 380f)),
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+            Column {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(top = 14.dp)
                         .height(1.dp)
                         .background(ChronosColors.OutlineVariant.copy(alpha = 0.30f)),
                 )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                ChronosPill(
-                    text = alarm.sound,
-                    leadingIcon = "graphic_eq",
-                    leadingIconTint = ChronosColors.TertiaryContainer,
-                    container = ChronosColors.SurfaceContainer,
-                    borderColor = Color.Transparent,
-                    onClick = { },
-                )
-                Spacer(Modifier.width(8.dp))
-                alarm.routine?.let { routine ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     ChronosPill(
-                        text = routine,
-                        leadingIcon = "assistant",
-                        leadingIconTint = ChronosColors.Secondary,
-                        iconFilled = true,
+                        text = alarm.soundTitle,
+                        leadingIcon = "volume_up",
+                        leadingIconTint = MaterialTheme.colorScheme.tertiaryContainer,
                         container = ChronosColors.SurfaceContainer,
                         borderColor = Color.Transparent,
-                        onClick = { },
+                        onClick = onClick,
                     )
                     Spacer(Modifier.width(8.dp))
-                }
-                if (alarm.vibrate) {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(ChronosColors.SurfaceContainer),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        ChronosIcon(
-                            name = "vibration",
-                            size = 16.dp,
-                            tint = ChronosColors.Outline,
-                        )
+                    if (alarm.vibrate) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(ChronosColors.SurfaceContainer),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            ChronosIcon(
+                                name = "vibration",
+                                size = 16.dp,
+                                tint = ChronosColors.Outline,
+                            )
+                        }
+                        Spacer(Modifier.width(8.dp))
                     }
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        text = "Edit",
+                        style = ChronosType.LabelMd,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(ChronosRadius.Pill))
+                            .clickable(onClick = onClick)
+                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                    )
                 }
             }
         }
@@ -435,7 +500,7 @@ private fun DayPill(
 
     val container by animateColorAsState(
         targetValue = when {
-            selected && alarmEnabled -> ChronosColors.PrimaryContainer
+            selected && alarmEnabled -> MaterialTheme.colorScheme.primaryContainer
             selected -> ChronosColors.SurfaceContainerHigh
             else -> if (alarmEnabled) ChronosColors.SurfaceContainer else ChronosColors.SurfaceContainerLowest
         },
@@ -444,8 +509,8 @@ private fun DayPill(
     )
     val content by animateColorAsState(
         targetValue = when {
-            selected && alarmEnabled -> ChronosColors.OnPrimaryContainer
-            selected -> ChronosColors.SecondaryFixedDim
+            selected && alarmEnabled -> MaterialTheme.colorScheme.onPrimaryContainer
+            selected -> MaterialTheme.colorScheme.secondary
             else -> ChronosColors.Outline.copy(alpha = if (alarmEnabled) 1f else 0.40f)
         },
         animationSpec = spring(dampingRatio = 0.7f, stiffness = 520f),
@@ -496,13 +561,13 @@ private fun BedtimeCard(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(ChronosRadius.IconWell))
-                    .background(ChronosColors.SecondaryContainer.copy(alpha = 0.50f)),
+                    .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.50f)),
                 contentAlignment = Alignment.Center,
             ) {
                 ChronosIcon(
                     name = "bedtime",
                     size = 26.dp,
-                    tint = ChronosColors.SecondaryFixedDim,
+                    tint = MaterialTheme.colorScheme.secondary,
                     filled = true,
                 )
             }
@@ -511,7 +576,7 @@ private fun BedtimeCard(
                 Text(
                     text = "SLEEP SCHEDULE",
                     style = ChronosType.Eyebrow,
-                    color = ChronosColors.Tertiary,
+                    color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
@@ -526,14 +591,6 @@ private fun BedtimeCard(
                     color = ChronosColors.Outline,
                 )
             }
-            ChronosIconButton(
-                icon = "arrow_forward_ios",
-                contentDescription = "Configure sleep schedule",
-                onClick = { },
-                size = 36.dp,
-                iconSize = 20.dp,
-                tint = ChronosColors.Outline,
-            )
         }
 
         Box(
@@ -553,7 +610,7 @@ private fun BedtimeCard(
             ChronosIcon(
                 name = "hotel",
                 size = 16.dp,
-                tint = ChronosColors.Tertiary,
+                tint = MaterialTheme.colorScheme.tertiary,
             )
             Spacer(Modifier.width(8.dp))
             Text(
@@ -561,21 +618,13 @@ private fun BedtimeCard(
                 style = ChronosType.LabelSm,
                 color = ChronosColors.Outline,
             )
-            Spacer(Modifier.weight(1f))
-            Text(
-                text = "Change bedtime",
-                style = ChronosType.LabelSm,
-                color = ChronosColors.Secondary,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.clickable { },
-            )
         }
     }
 }
 
 /** `Tomorrow` for a repeating alarm, `Today` when it is still due today. */
 private fun nextOccurrenceLabel(alarm: Alarm, now: ZonedDateTime): String {
-    val localNow = now.toLocalDateTime()
+    val localNow: LocalDateTime = now.toLocalDateTime()
     if (alarm.days.isEmpty()) {
         val today = localNow.toLocalDate().atTime(alarm.hour, alarm.minute)
         return if (today.isAfter(localNow)) "Today" else "Tomorrow"
